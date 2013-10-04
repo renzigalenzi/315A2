@@ -30,13 +30,16 @@ public class Reversi extends Applet implements MouseListener
 	//addMouseListener(this);
 	Vector ColorVector;
 	String yourgrapher;
+	Random rand = new Random();
 	int xaxislength = 800;
 	int yaxislength = 600;
 	int clicks = 0;
+	boolean AiPresent=false;
+	boolean BothAi = false;
 	public static final int apwidth =800;
 	public static final int apheight =600;
 	boolean mouse_clicked=false;
-	int p=0;
+	int p=-1;
 	int boardoffset = 100;
 	
 	//pieces
@@ -133,11 +136,15 @@ public class Reversi extends Applet implements MouseListener
     }
 	public void paint(Graphics g)
 	{
-		
+		if(p==-1)
+		{
+		addMouseListener(this); 
+		p=0;
+		}
 		if(p==0)
 		{
 		System.out.println("Welcome");
-			addMouseListener(this); 
+			
 			for (int i=0; i < 8; i++)
 				for (int j=0; j < 8; j++)
 					board[i][j] = blank;
@@ -184,9 +191,13 @@ public class Reversi extends Applet implements MouseListener
 			ResetMoveList();
 			mouse_clicked=false;
 			}
+			drawBoard(g);
+			UndoButton(g,mX,mY);
 			findMoves();
-			if(!isTurn(turn))
+			drawPieces(g);	
+			if(!isTurn(turn)&&!gameover())
 			{
+			delay(1);
 			for(int i=8;i>=0;i--)
 				for(int j=0;j<7;j++)
 					for(int k=0;k<7;k++)
@@ -214,13 +225,24 @@ public class Reversi extends Applet implements MouseListener
 			{
 				System.out.println("game over");
 				getWinner(g);
+				if(mouse_clicked)
+				{
+				NewGame();
+				repaint();
+				}
 			}
 			if (!gameover())
 			{
 				g.drawString(turn == white ? "white's turn" : "black's turn",200,550);
+				if(BothAi)
+				repaint();
 			}
 		}
 	}
+	public void NewGame () {
+		p=0;
+		ResetMoveList();
+    }
 	public boolean gameover () {
 		int spaces=0;
 		int movepossibilities = 0;
@@ -262,15 +284,21 @@ public class Reversi extends Applet implements MouseListener
 		if (movepossibilities == 0 && spaces>0)
 		{
 			if (blackpieces == 0 ||whitepieces == 0)
+			{
 			g.drawString(turn == black ? "Black Wins!" : "White Wins!",200,550);
+			System.out.println(turn == black ? "Black Wins! win by moves" : "White Wins! win by moves");
+			}
 			else
+			{
 			g.drawString(turn == white ? "Black Wins!" : "White Wins!",200,550);
-			System.out.println("win by moves");
+			System.out.println(turn == white? "Black Wins! win by moves" : "White Wins! win by moves");
+			}
+			
 		}
 		else if (blackpieces != whitepieces)
 		{
 		g.drawString(blackpieces > whitepieces ? "Black Wins!" : "White Wins!",200,550);
-		System.out.println("win by number");
+		System.out.println(blackpieces > whitepieces ? "Black Wins! win by number" : "White Wins! win by number");
 		}
 		else
 		{
@@ -310,6 +338,7 @@ public class Reversi extends Applet implements MouseListener
 	int ivalue = 0;
 	int jvalue = 0;
 	int tempweight = 0;
+	int  n = rand.nextInt(50) + 1;
 	for (int i=0; i<8; i++)
 			for (int j=0; j<8; j++)
 			{
@@ -322,6 +351,17 @@ public class Reversi extends Applet implements MouseListener
 					ivalue = i;
 					jvalue = j;
 					}
+				
+				if (tempweight==highestweight)
+					{
+					n = rand.nextInt(50);
+					if (n<26)
+					{
+					highestweight = tempweight;
+					ivalue = i;
+					jvalue = j;
+					}
+				}	
 				}
 			}
 	System.out.println("highest weight was "+highestweight+" from "+ivalue+" "+jvalue);
@@ -419,7 +459,13 @@ public class Reversi extends Applet implements MouseListener
 		blackdifficulty=hard;
 		
 		if (x<475&&x>175&&y<550&&y>450)
+		{
+			if (blackplayer==Ai||whiteplayer==Ai)
+			AiPresent=true;
+			if (blackplayer==Ai&&whiteplayer==Ai)
+			BothAi=true;
 		p=2;
+		}
     }
 	public void drawBoard(Graphics g) {
 		g.setColor(Background);
@@ -434,6 +480,7 @@ public class Reversi extends Applet implements MouseListener
     }
 	public void UndoButton(Graphics g,int x,int y) {
 	boolean difference = false;
+	int iterator=1;
 		g.setColor(Color.darkGray);
 		g.fillRect(548,353,104,44);
 		g.setColor(Color.lightGray);
@@ -443,6 +490,10 @@ public class Reversi extends Applet implements MouseListener
 		g.drawString("UNDO",555,385);
 		
 		if (x<652&&x>548&&y<397&&y>353)
+		{
+		if(AiPresent==true)
+		iterator=2;
+		for(int it=0;it<iterator;it++)
 		{
 		System.out.println("undo");
 		ResetMoveList();
@@ -465,6 +516,7 @@ public class Reversi extends Applet implements MouseListener
 				undoboards[i][j][k]=undoboards[i+1][j][k];
 				}
 		ResetMoveList();
+		}
 		}
 		
 			
@@ -952,12 +1004,33 @@ public class Reversi extends Applet implements MouseListener
 			i=reseti;
 			j=resetj;
 			
-		}	
-    
-	System.out.println("weight of "+i+" "+j+" = " + counter);
+		}
+	if ((turn==black&&blackdifficulty>=medium)||(turn==white&&whitedifficulty>=medium))
+	{
+	if (isCorner(i,j))
+	counter+=10;
+    if (isSubCorner(i,j))
+	counter-=3;
+	}
+	
+	//System.out.println("weight of "+i+" "+j+" = " + counter);
 	return counter;
 	}
 	
+	
+	public boolean isCorner(int i, int j)
+	{
+		if((i==0&&j==0)||(i==0&&j==7)||(i==7&&j==0)||(i==7&&j==7))
+		return true;
+		return false;
+	}
+	
+	public boolean isSubCorner(int i, int j)
+	{
+		if((i==1&&j==0)||(i==1&&j==7)||(i==7&&j==1)||(i==7&&j==6)||(i==1&&j==1)||(i==1&&j==6)||(i==6&&j==0)||(i==6&&j==7)||(i==0&&j==1)||(i==0&&j==6)||(i==6&&j==1)||(i==6&&j==6))
+		return true;
+		return false;
+	}
 	
 	
 	
@@ -970,7 +1043,7 @@ public class Reversi extends Applet implements MouseListener
 				undoboards[i][j][k]=board[j][k];
 				}
 		}
-    	public void delay(double n)
+    public void delay(double n)
 	{
 		long startDelay = System.currentTimeMillis();
 		long endDelay = 0;
