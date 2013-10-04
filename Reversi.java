@@ -44,6 +44,18 @@ public class Reversi extends Applet implements MouseListener
 	final int black = 1;  
 	final int white = 2; 
 	final int green = 3;
+	//players
+	int whiteplayer=0;
+	int blackplayer=0;
+	final int human = 0;
+	final int Ai = 1;
+	//difficulties
+	int blackdifficulty = 0;
+	int whitedifficulty = 0;
+	final int easy = 0;
+	final int medium = 1;
+	final int hard = 2;
+	
 	int board[][] = new int[8][8];
 	int undoboards[][][] = new int[10][8][8];
 	
@@ -126,6 +138,7 @@ public class Reversi extends Applet implements MouseListener
 		
 		if(p==0)
 		{
+		System.out.println("Welcome");
 			addMouseListener(this); 
 			for (int i=0; i < 8; i++)
 				for (int j=0; j < 8; j++)
@@ -138,50 +151,58 @@ public class Reversi extends Applet implements MouseListener
 			p=1;
 			fillundoboards();
 		}
-		
-		else if(!gameover()&&mouse_clicked&&isPlayable(mX,mY))
+		if(p==1)
 		{
-		ResetMoveList();
-		for(int i=8;i>=0;i--)
+		System.out.println("Main Menu");
+		
+		if (mouse_clicked)
+		{
+		selectMenu(mX,mY);
+		mouse_clicked=false;
+		}
+		drawMenu(g);
+		}
+		if (p==2)
+		{
+			if(!gameover()&&mouse_clicked&&isPlayable(mX,mY))
+			{
+			ResetMoveList();
+			for(int i=8;i>=0;i--)
+				for(int j=0;j<7;j++)
+					for(int k=0;k<7;k++)
+					{
+					undoboards[i+1][j][k]=undoboards[i][j][k];
+					}
 			for(int j=0;j<7;j++)
 				for(int k=0;k<7;k++)
 				{
-				undoboards[i+1][j][k]=undoboards[i][j][k];
+					undoboards[0][j][k]=board[j][k];
 				}
-		for(int j=0;j<7;j++)
-			for(int k=0;k<7;k++)
-			{
-				undoboards[0][j][k]=board[j][k];
+			play(mX,mY);
+			//System.out.print("clicked");
+			otherturn = otherturn == white ? black : white;
+			turn = turn == white ? black : white;
+		
+			ResetMoveList();
+			mouse_clicked=false;
 			}
-		play(mX,mY);
-		//System.out.print("clicked");
-		otherturn = otherturn == white ? black : white;
-		turn = turn == white ? black : white;
 		
-		ResetMoveList();
-		mouse_clicked=false;
-		}
-		
-		drawBoard(g);
-		UndoButton(g,mX,mY);
-		findMoves();
-		drawPieces(g);	
-		g.setFont(Enter);
-		g.setColor(Color.black);
-		if (gameover())
-		{
-		System.out.println("game over");
-		getWinner(g);
-		}
-		if (!gameover())
-		{
-		g.drawString(turn == white ? "white's turn" : "black's turn",200,550);
-		}
-			/*g.drawString("mX = " + mX + " mY = " + mY ,200,550+wordloc);
-			if (mX !=0 && mY != 0)
+			drawBoard(g);
+			UndoButton(g,mX,mY);
+			findMoves();
+			drawPieces(g);	
+			g.setFont(Enter);
+			g.setColor(Color.black);
+			if (gameover())
 			{
-			g.drawString("mX = " + mX + " mY = " + mY ,200,500+wordloc);
-			}*/
+				System.out.println("game over");
+				getWinner(g);
+			}
+			if (!gameover())
+			{
+				g.drawString(turn == white ? "white's turn" : "black's turn",200,550);
+			}
+		}
 	}
 	public boolean gameover () {
 		int spaces=0;
@@ -252,9 +273,102 @@ public class Reversi extends Applet implements MouseListener
 	x=(x-boardoffset)/50;
 	y=(y-boardoffset)/50;
 		board[x][y]=turn;
+		System.out.println("ok");
 		ChangePieces(x,y);
     }
-	
+	public void drawMenu(Graphics g) {
+		g.setColor(Background);
+		g.fillRect(0,0,apwidth,apheight);
+		
+		//White side
+		g.setColor(Color.lightGray);
+		g.fillRect(25,200,200,50);
+		g.fillRect(25,300,225,50);
+		
+		g.setColor(Color.darkGray);
+		g.fillRect(25+100*whiteplayer,200,100,50);
+		g.fillRect(25+75*whitedifficulty,300,75,50);
+		
+		g.setColor(Color.black);
+		g.drawRect(25,200,100,50);
+		g.drawRect(125,200,100,50);
+		
+		g.drawRect(25,300,75,50);
+		g.drawRect(100,300,75,50);
+		g.drawRect(175,300,75,50);
+		
+		//Black side
+		g.setColor(Color.lightGray);
+		g.fillRect(400,200,200,50);
+		g.fillRect(400,300,225,50);
+		
+		g.setColor(Color.darkGray);
+		g.fillRect(400+100*blackplayer,200,100,50);
+		g.fillRect(400+75*blackdifficulty,300,75,50);
+		g.setColor(Color.black);
+		g.drawRect(400,200,100,50);
+		g.drawRect(500,200,100,50);
+		
+		g.drawRect(400,300,75,50);
+		g.drawRect(475,300,75,50);
+		g.drawRect(550,300,75,50);
+		
+		//Play Button
+		g.setColor(Color.lightGray);
+		g.fillRect(175,450,300,100);
+		g.setColor(Color.black);
+		g.drawRect(175,450,300,100);
+		
+		g.setColor(Color.black);
+		g.setFont(script);
+		g.drawString("MAIN MENU",220,100);
+		g.drawString("WHITE",30,170);
+		g.drawString("BLACK",420,170);
+		g.drawString("VS.",320,300);
+		g.drawString("PLAY",280,510);
+		g.setFont(title);
+		g.drawString("Human",30,240);
+		g.drawString("AI",130,240);
+		g.drawString("Human",410,240);
+		g.drawString("AI",510,240);
+		
+		g.drawString("Easy",30,340);
+		g.drawString("Medium",105,340);
+		g.drawString("Hard",180,340);
+		g.drawString("Easy",405,340);
+		g.drawString("Medium",480,340);
+		g.drawString("Hard",555,340);
+		
+    }
+	public void selectMenu(int x, int y) {
+		if (x<125&&x>25&&y<250&&y>200)
+		whiteplayer = human;
+		if (x<225&&x>125&&y<250&&y>200)
+		whiteplayer = Ai;
+		
+		if (x<100&&x>25&&y<350&&y>300)
+		whitedifficulty=easy;
+		if (x<175&&x>100&&y<350&&y>300)
+		whitedifficulty=medium;
+		if (x<250&&x>175&&y<350&&y>300)
+		whitedifficulty=hard;
+		
+		
+		if (x<500&&x>400&&y<250&&y>200)
+		blackplayer = human;
+		if (x<600&&x>500&&y<250&&y>200)
+		blackplayer = Ai;
+		
+		if (x<475&&x>400&&y<350&&y>300)
+		blackdifficulty=easy;
+		if (x<550&&x>475&&y<350&&y>300)
+		blackdifficulty=medium;
+		if (x<625&&x>550&&y<350&&y>300)
+		blackdifficulty=hard;
+		
+		if (x<475&&x>175&&y<550&&y>450)
+		p=2;
+    }
 	public void drawBoard(Graphics g) {
 		g.setColor(Background);
 		g.fillRect(0,0,apwidth,apheight);
