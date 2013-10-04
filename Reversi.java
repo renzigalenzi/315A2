@@ -17,7 +17,7 @@ import javax.sound.sampled.*;
 
 
  
-public class KeyHero extends Applet implements MouseListener
+public class Reversi extends Applet implements MouseListener
 {
 	int fontsize=30;
 	Font Enter = new Font("Serif",Font.BOLD,fontsize);
