@@ -70,9 +70,6 @@ public class Reversi extends Applet implements MouseListener
 	public void init()
 	{
 		start();
-		
-		
-
 	}
 	 public static void main(String arg[])throws Exception {
   	{
@@ -190,6 +187,17 @@ public class Reversi extends Applet implements MouseListener
 			findMoves();
 			if(!isTurn(turn))
 			{
+			for(int i=8;i>=0;i--)
+				for(int j=0;j<7;j++)
+					for(int k=0;k<7;k++)
+					{
+					undoboards[i+1][j][k]=undoboards[i][j][k];
+					}
+			for(int j=0;j<7;j++)
+				for(int k=0;k<7;k++)
+				{
+					undoboards[0][j][k]=board[j][k];
+				}
 			AiPlay();
 			otherturn = otherturn == white ? black : white;
 			turn = turn == white ? black : white;
@@ -316,6 +324,7 @@ public class Reversi extends Applet implements MouseListener
 					}
 				}
 			}
+	System.out.println("highest weight was "+highestweight+" from "+ivalue+" "+jvalue);
 	board[ivalue][jvalue]=turn;
 	ChangePieces(ivalue,jvalue);
     }
@@ -515,7 +524,7 @@ public class Reversi extends Applet implements MouseListener
 			{
 				if (board[i][j]==turn)
 					counter++;
-				j--;
+					j--;
 			}
 			i=reseti;
 			j=resetj;
@@ -817,10 +826,141 @@ public class Reversi extends Applet implements MouseListener
 			j=resetj;
 		}	
     }
-	public int getWeight(int x, int y)
+	public int getWeight(int i, int j)
 	{
-	return 1;
+	//left
+		int resetj=j;
+		int reseti=i;
+		int counter = 0;
+		if(j>0&&board[i][j-1]!=blank&&board[i][j-1]!=green)
+		{
+			j--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green)
+			{
+				if (board[i][j]!=turn)
+					counter++;
+				j--;
+			}
+			i=reseti;
+			j=resetj;
+			
+		}
+		
+		//right
+		if(j<7&&board[i][j+1]!=blank&&board[i][j+1]!=green)
+		{
+		j++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green)
+			{
+				if (board[i][j]!=turn)
+					counter++;
+				j++;
+			}
+			i=reseti;
+			j=resetj;
+			
+		}
+		//up
+		if(i>0&&board[i-1][j]!=blank&&board[i-1][j]!=green)
+		{
+		i--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green)
+			{
+				if (board[i][j]!=turn)
+					counter++;
+				i--;
+			}
+			i=reseti;
+			j=resetj;
+			
+		}
+		//down
+		if(i<7&&board[i+1][j]!=blank&&board[i+1][j]!=green)
+		{
+		i++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green)
+			{
+				if (board[i][j]!=turn)
+					counter++;
+				i++;
+			}
+			i=reseti;
+			j=resetj;
+			
+		}	
+		//up left
+		if(i<7&&j>0&&board[i+1][j-1]!=blank&&board[i+1][j-1]!=green)
+		{
+		j--;
+		i++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green)
+			{
+				if (board[i][j]!=turn)
+					counter++;
+				j--;
+				i++;
+			}
+			i=reseti;
+			j=resetj;
+			
+		}
+		
+		//up right
+		if(i<7&&j<7&&board[i+1][j+1]!=blank&&board[i+1][j+1]!=green)
+		{
+		j++;
+		i++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green)
+			{
+				if (board[i][j]!=turn)
+					counter++;
+				j++;
+				i++;
+			}
+			i=reseti;
+			j=resetj;
+			
+		}
+		//down left
+		if(i>0&&j>0&&board[i-1][j-1]!=blank&&board[i-1][j-1]!=green)
+		{
+		j--;
+		i--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green)
+			{
+				if (board[i][j]!=turn)
+					counter++;
+				j--;
+				i--;
+			}
+			i=reseti;
+			j=resetj;
+			
+		}
+		//down right
+		if(i>0&&j<7&&board[i-1][j+1]!=blank&&board[i-1][j+1]!=green)
+		{
+		j++;
+		i--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green)
+			{
+				if (board[i][j]!=turn)
+					counter++;
+				j++;
+				i--;
+			}
+			i=reseti;
+			j=resetj;
+			
+		}	
+    
+	System.out.println("weight of "+i+" "+j+" = " + counter);
+	return counter;
 	}
+	
+	
+	
+	
     	public void fillundoboards()
 		{
 		for(int i=0;i<10;i++)
