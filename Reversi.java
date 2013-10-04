@@ -67,7 +67,7 @@ public class Reversi extends Applet implements MouseListener
     
     //Frame frame = new Frame();
 		Frame frame = new Frame();
-		Applet applet = new KeyHero();
+		Applet applet = new Reversi();
 		frame.addWindowListener(new WindowAdapter()
 		{
 		public void windowClosing(WindowEvent e)
