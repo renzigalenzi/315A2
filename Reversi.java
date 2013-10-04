@@ -22,7 +22,7 @@ public class Reversi extends Applet implements MouseListener
 	int fontsize=30;
 	Font Enter = new Font("Serif",Font.BOLD,fontsize);
 	Font title = new Font("Serif",Font.BOLD,19);
-	Font script = new Font("Serif",Font.PLAIN,12);
+	Font script = new Font("Serif",Font.BOLD,30);
 	Font Failed = new Font("Serif",Font.ITALIC,80);
 	Font Title = new Font("Serif",Font.BOLD,80);
 	Vector NoteVector;
@@ -45,6 +45,7 @@ public class Reversi extends Applet implements MouseListener
 	final int white = 2; 
 	final int green = 3;
 	int board[][] = new int[8][8];
+	int undoboards[][][] = new int[10][8][8];
 	
 	int wordloc=30; //shifting any words
 	
@@ -135,18 +136,34 @@ public class Reversi extends Applet implements MouseListener
 			board[3][4] = black;
 			board[4][3] = black;
 			p=1;
+			fillundoboards();
 		}
 		
 		else if(!gameover()&&mouse_clicked&&isPlayable(mX,mY))
 		{
+		ResetMoveList();
+		for(int i=8;i>=0;i--)
+			for(int j=0;j<7;j++)
+				for(int k=0;k<7;k++)
+				{
+				undoboards[i+1][j][k]=undoboards[i][j][k];
+				}
+		for(int j=0;j<7;j++)
+			for(int k=0;k<7;k++)
+			{
+				undoboards[0][j][k]=board[j][k];
+			}
 		play(mX,mY);
 		//System.out.print("clicked");
 		otherturn = otherturn == white ? black : white;
 		turn = turn == white ? black : white;
+		
 		ResetMoveList();
 		mouse_clicked=false;
 		}
+		
 		drawBoard(g);
+		UndoButton(g,mX,mY);
 		findMoves();
 		drawPieces(g);	
 		g.setFont(Enter);
@@ -248,6 +265,45 @@ public class Reversi extends Applet implements MouseListener
 			g.drawLine(i,boardoffset,i,boardoffset + 400);
 			g.drawLine(boardoffset,i,boardoffset + 400,i);
 		}
+    }
+	public void UndoButton(Graphics g,int x,int y) {
+	boolean difference = false;
+		g.setColor(Color.darkGray);
+		g.fillRect(548,353,104,44);
+		g.setColor(Color.lightGray);
+		g.fillRect(550,355,100,40);
+		g.setColor(Color.red);
+		g.setFont(script);
+		g.drawString("UNDO",555,385);
+		
+		if (x<652&&x>548&&y<397&&y>353)
+		{
+		System.out.println("undo");
+		ResetMoveList();
+		for(int j=0;j<7;j++)
+				for(int k=0;k<7;k++)
+				{
+				if (board[j][k]!=undoboards[0][j][k])
+					difference=true;
+				board[j][k]=undoboards[0][j][k];
+				}
+		if (difference)
+				{
+				otherturn = otherturn == white ? black : white;
+				turn = turn == white ? black : white;
+				}
+		for(int i=0;i<9;i++)
+			for(int j=0;j<7;j++)
+				for(int k=0;k<7;k++)
+				{
+				undoboards[i][j][k]=undoboards[i+1][j][k];
+				}
+		ResetMoveList();
+		}
+		
+			
+		
+		
     }
 	public void drawPieces(Graphics g) {
 		for (int i=0; i<8; i++)
@@ -604,7 +660,15 @@ public class Reversi extends Applet implements MouseListener
 			j=resetj;
 		}	
     }
-    	
+    	public void fillundoboards()
+		{
+		for(int i=0;i<10;i++)
+			for(int j=0;j<7;j++)
+				for(int k=0;k<7;k++)
+				{
+				undoboards[i][j][k]=board[j][k];
+				}
+		}
     	public void delay(double n)
 	{
 		long startDelay = System.currentTimeMillis();
