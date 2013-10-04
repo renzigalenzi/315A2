@@ -57,6 +57,7 @@ public class Reversi extends Applet implements MouseListener
 	final int hard = 2;
 	
 	int board[][] = new int[8][8];
+	int weight[][] = new int[8][8];
 	int undoboards[][][] = new int[10][8][8];
 	
 	int wordloc=30; //shifting any words
@@ -164,7 +165,7 @@ public class Reversi extends Applet implements MouseListener
 		}
 		if (p==2)
 		{
-			if(!gameover()&&mouse_clicked&&isPlayable(mX,mY))
+			if(!gameover()&&mouse_clicked&&isPlayable(mX,mY)&&isTurn(turn))
 			{
 			ResetMoveList();
 			for(int i=8;i>=0;i--)
@@ -185,6 +186,14 @@ public class Reversi extends Applet implements MouseListener
 		
 			ResetMoveList();
 			mouse_clicked=false;
+			}
+			findMoves();
+			if(!isTurn(turn))
+			{
+			AiPlay();
+			otherturn = otherturn == white ? black : white;
+			turn = turn == white ? black : white;
+			ResetMoveList();
 			}
 		
 			drawBoard(g);
@@ -244,6 +253,9 @@ public class Reversi extends Applet implements MouseListener
 		g.setColor(Color.black);
 		if (movepossibilities == 0 && spaces>0)
 		{
+			if (blackpieces == 0 ||whitepieces == 0)
+			g.drawString(turn == black ? "Black Wins!" : "White Wins!",200,550);
+			else
 			g.drawString(turn == white ? "Black Wins!" : "White Wins!",200,550);
 			System.out.println("win by moves");
 		}
@@ -268,6 +280,15 @@ public class Reversi extends Applet implements MouseListener
 		}
 			return false;
     }
+	public boolean isTurn (int turn) {
+		if (turn==black&&blackplayer==0)
+		return true;
+		else if(turn==white&&whiteplayer==0)
+		return true;
+		else
+		return false;
+
+    }
 	
 	public void play(int x, int y) {
 	x=(x-boardoffset)/50;
@@ -275,6 +296,28 @@ public class Reversi extends Applet implements MouseListener
 		board[x][y]=turn;
 		System.out.println("ok");
 		ChangePieces(x,y);
+    }
+	public void AiPlay() {
+	int highestweight = 0;
+	int ivalue = 0;
+	int jvalue = 0;
+	int tempweight = 0;
+	for (int i=0; i<8; i++)
+			for (int j=0; j<8; j++)
+			{
+			if(board[i][j]==green)
+				{
+				tempweight=getWeight(i,j);
+				if (tempweight>highestweight)
+					{	
+					highestweight = tempweight;
+					ivalue = i;
+					jvalue = j;
+					}
+				}
+			}
+	board[ivalue][jvalue]=turn;
+	ChangePieces(ivalue,jvalue);
     }
 	public void drawMenu(Graphics g) {
 		g.setColor(Background);
@@ -774,6 +817,10 @@ public class Reversi extends Applet implements MouseListener
 			j=resetj;
 		}	
     }
+	public int getWeight(int x, int y)
+	{
+	return 1;
+	}
     	public void fillundoboards()
 		{
 		for(int i=0;i<10;i++)
