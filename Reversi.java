@@ -36,6 +36,8 @@ public class Reversi extends Applet implements MouseListener
 	int clicks = 0;
 	boolean AiPresent=false;
 	boolean BothAi = false;
+	boolean nomoves = false;
+	boolean refreshed =false;
 	public static final int apwidth =800;
 	public static final int apheight =600;
 	boolean mouse_clicked=false;
@@ -69,7 +71,17 @@ public class Reversi extends Applet implements MouseListener
 	int otherturn = white;
 	int mX = 0;//clicked
 	int mY = 0;
-	
+	int[][] weights = new int[][]
+								{
+								{50, -4, 4, 3, 3, 4, -4, 50},
+								{-4, -8, -2, -2, -2, -2, -8, -4},
+								{4, -2, 4, 2, 2, 4, -2, 4},
+								{3, -2, 2, 0, 0, 2, -2, 3},
+								{3, -2, 2, 0, 0, 2, -2, 3},
+								{4, -2, 4, 2, 2, 4, -2, 4},
+								{-4, -8, -2, -2, -2, -2, -8, -4},
+								{50, -4, 4, 3, 3, 4, -4, 50}
+								};
 	public void init()
 	{
 		start();
@@ -193,6 +205,7 @@ public class Reversi extends Applet implements MouseListener
 			}
 			drawBoard(g);
 			UndoButton(g,mX,mY);
+			NewGame(g,mX,mY);
 			findMoves();
 			drawPieces(g);	
 			if(!isTurn(turn)&&!gameover())
@@ -219,17 +232,19 @@ public class Reversi extends Applet implements MouseListener
 			UndoButton(g,mX,mY);
 			findMoves();
 			drawPieces(g);	
+			NewGame(g,mX,mY);
 			g.setFont(Enter);
 			g.setColor(Color.black);
 			if (gameover())
 			{
 				System.out.println("game over");
 				getWinner(g);
-				if(mouse_clicked)
+				if (!refreshed)
 				{
-				NewGame();
 				repaint();
+				refreshed=true;
 				}
+				
 			}
 			if (!gameover())
 			{
@@ -239,9 +254,23 @@ public class Reversi extends Applet implements MouseListener
 			}
 		}
 	}
-	public void NewGame () {
+	public void NewGame (Graphics g, int x, int y) {
+	
+		g.setColor(Color.darkGray);
+		g.fillRect(548,453,104,44);
+		g.setColor(Color.lightGray);
+		g.fillRect(550,455,100,40);
+		g.setColor(Color.red);
+		g.setFont(script);
+		g.drawString("MENU",555,485);
+		if (mouse_clicked&&x<652&&x>548&&y<497&&y>453)
+		{
+		mouse_clicked=false;
 		p=0;
 		ResetMoveList();
+		refreshed = false;
+		repaint();
+		}
     }
 	public boolean gameover () {
 		int spaces=0;
@@ -256,10 +285,20 @@ public class Reversi extends Applet implements MouseListener
 			}
 		if (spaces == 0 && movepossibilities == 0)
 			return true;
-		else if (movepossibilities == 0)
+		else if (movepossibilities == 0&&nomoves)
+		{
 			return true;
-		else 
+		}
+		else if (movepossibilities == 0)
+		{
+			nomoves=true;
 			return false;
+		}
+		else 
+		{
+			nomoves=false;
+			return false;
+			}
     }
 	
 	public void getWinner (Graphics g) {
@@ -281,21 +320,21 @@ public class Reversi extends Applet implements MouseListener
 			}
 		System.out.println("blank = " + blank +"black = " + blackpieces +"white = " + whitepieces +"green = " + green);
 		g.setColor(Color.black);
-		if (movepossibilities == 0 && spaces>0)
+		/*if (movepossibilities == 0 && spaces>0)
 		{
-			if (blackpieces == 0 ||whitepieces == 0)
-			{
-			g.drawString(turn == black ? "Black Wins!" : "White Wins!",200,550);
-			System.out.println(turn == black ? "Black Wins! win by moves" : "White Wins! win by moves");
-			}
-			else
+			/*if (blackpieces == 0 ||whitepieces == 0)
 			{
 			g.drawString(turn == white ? "Black Wins!" : "White Wins!",200,550);
-			System.out.println(turn == white? "Black Wins! win by moves" : "White Wins! win by moves");
+			System.out.println(turn == white ? "Black Wins! win by moves" : "White Wins! win by moves");
+			/*}
+			else
+			{
+			g.drawString(turn == black ? "Black Wins!" : "White Wins!",200,550);
+			System.out.println(turn == black? "Black Wins! win by moves" : "White Wins! win by moves");
 			}
 			
-		}
-		else if (blackpieces != whitepieces)
+		}*/
+		if (blackpieces != whitepieces)
 		{
 		g.drawString(blackpieces > whitepieces ? "Black Wins!" : "White Wins!",200,550);
 		System.out.println(blackpieces > whitepieces ? "Black Wins! win by number" : "White Wins! win by number");
@@ -335,8 +374,8 @@ public class Reversi extends Applet implements MouseListener
     }
 	public void AiPlay() {
 	int highestweight = 0;
-	int ivalue = 0;
-	int jvalue = 0;
+	int ivalue = -1;
+	int jvalue = -1;
 	int tempweight = 0;
 	int  n = rand.nextInt(50) + 1;
 	for (int i=0; i<8; i++)
@@ -365,8 +404,11 @@ public class Reversi extends Applet implements MouseListener
 				}
 			}
 	System.out.println("highest weight was "+highestweight+" from "+ivalue+" "+jvalue);
+	if (ivalue>=0&&jvalue>=0)
+	{
 	board[ivalue][jvalue]=turn;
 	ChangePieces(ivalue,jvalue);
+	}
     }
 	public void drawMenu(Graphics g) {
 		g.setColor(Background);
@@ -477,6 +519,7 @@ public class Reversi extends Applet implements MouseListener
 			g.drawLine(i,boardoffset,i,boardoffset + 400);
 			g.drawLine(boardoffset,i,boardoffset + 400,i);
 		}
+
     }
 	public void UndoButton(Graphics g,int x,int y) {
 	boolean difference = false;
@@ -489,10 +532,14 @@ public class Reversi extends Applet implements MouseListener
 		g.setFont(script);
 		g.drawString("UNDO",555,385);
 		
-		if (x<652&&x>548&&y<397&&y>353)
+		if (mouse_clicked&&x<652&&x>548&&y<397&&y>353)
 		{
+		mouse_clicked=false;
 		if(AiPresent==true)
+		{
 		iterator=2;
+		System.out.println("doubles");
+		}
 		for(int it=0;it<iterator;it++)
 		{
 		System.out.println("undo");
@@ -518,9 +565,6 @@ public class Reversi extends Applet implements MouseListener
 		ResetMoveList();
 		}
 		}
-		
-			
-		
 		
     }
 	public void drawPieces(Graphics g) {
@@ -1005,19 +1049,26 @@ public class Reversi extends Applet implements MouseListener
 			j=resetj;
 			
 		}
-	if ((turn==black&&blackdifficulty>=medium)||(turn==white&&whitedifficulty>=medium))
+	if ((turn==black&&blackdifficulty==medium)||(turn==white&&whitedifficulty==medium))
 	{
 	if (isCorner(i,j))
 	counter+=10;
     if (isSubCorner(i,j))
 	counter-=3;
 	}
+	if ((turn==black&&blackdifficulty==hard)||(turn==white&&whitedifficulty==hard))
+	{
+	counter+=applyHard(i,j);
+	}
 	
 	//System.out.println("weight of "+i+" "+j+" = " + counter);
 	return counter;
 	}
 	
-	
+	public int applyHard(int i, int j)
+	{
+		return weights[i][j];
+	}
 	public boolean isCorner(int i, int j)
 	{
 		if((i==0&&j==0)||(i==0&&j==7)||(i==7&&j==0)||(i==7&&j==7))
