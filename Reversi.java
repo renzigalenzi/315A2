@@ -269,6 +269,8 @@ public class Reversi extends Applet implements MouseListener
 		p=0;
 		ResetMoveList();
 		refreshed = false;
+		AiPresent=false;
+		BothAi=false;
 		repaint();
 		}
     }
