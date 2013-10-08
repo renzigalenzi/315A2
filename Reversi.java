@@ -17,10 +17,11 @@ import javax.sound.sampled.*;
 
 
  
-public class Reversi extends Applet implements MouseListener
+public class Reversi extends Applet implements MouseListener, KeyListener
 {
 	int fontsize=30;
 	Font Enter = new Font("Serif",Font.BOLD,fontsize);
+	Font sub = new Font("Serif",Font.BOLD,10);
 	Font title = new Font("Serif",Font.BOLD,19);
 	Font script = new Font("Serif",Font.BOLD,30);
 	Font Failed = new Font("Serif",Font.ITALIC,80);
@@ -41,9 +42,11 @@ public class Reversi extends Applet implements MouseListener
 	public static final int apwidth =800;
 	public static final int apheight =600;
 	boolean mouse_clicked=false;
+	boolean typingClient=false;
 	int p=-1;
 	int boardoffset = 100;
-	
+	String HostId = "";
+	String ClientId = "";
 	//pieces
 	final int blank = 0; 
 	final int black = 1;  
@@ -108,6 +111,19 @@ public class Reversi extends Applet implements MouseListener
     frame.show();
   	}
 	}
+	public void keyPressed(KeyEvent evt) 
+	{
+	}
+	public void keyReleased(KeyEvent evt)	
+	{
+	}
+	public void keyTyped(KeyEvent evt)		
+	{
+	int key=0; key = evt.getKeyCode(); 
+	if(typingClient)
+	ClientId+=evt.getKeyChar();
+	repaint();
+	}
 	public void mousePressed(MouseEvent e) {
     }
 
@@ -151,6 +167,7 @@ public class Reversi extends Applet implements MouseListener
 		if(p==-1)
 		{
 		addMouseListener(this); 
+		addKeyListener(this); 
 		p=0;
 		}
 		if(p==0)
@@ -210,7 +227,7 @@ public class Reversi extends Applet implements MouseListener
 			drawPieces(g);	
 			if(!isTurn(turn)&&!gameover())
 			{
-			delay(1);
+			delay(500);
 			for(int i=8;i>=0;i--)
 				for(int j=0;j<7;j++)
 					for(int k=0;k<7;k++)
@@ -322,20 +339,6 @@ public class Reversi extends Applet implements MouseListener
 			}
 		System.out.println("blank = " + blank +"black = " + blackpieces +"white = " + whitepieces +"green = " + green);
 		g.setColor(Color.black);
-		/*if (movepossibilities == 0 && spaces>0)
-		{
-			/*if (blackpieces == 0 ||whitepieces == 0)
-			{
-			g.drawString(turn == white ? "Black Wins!" : "White Wins!",200,550);
-			System.out.println(turn == white ? "Black Wins! win by moves" : "White Wins! win by moves");
-			/*}
-			else
-			{
-			g.drawString(turn == black ? "Black Wins!" : "White Wins!",200,550);
-			System.out.println(turn == black? "Black Wins! win by moves" : "White Wins! win by moves");
-			}
-			
-		}*/
 		if (blackpieces != whitepieces)
 		{
 		g.drawString(blackpieces > whitepieces ? "Black Wins!" : "White Wins!",200,550);
@@ -455,6 +458,35 @@ public class Reversi extends Applet implements MouseListener
 		g.setColor(Color.black);
 		g.drawRect(175,450,300,100);
 		
+		//Host Button
+		g.setColor(Color.lightGray);
+		g.fillRect(560,375,75,30);
+		g.setColor(Color.black);
+		g.drawRect(560,375,75,30);
+		
+		g.setColor(Color.lightGray);
+		g.fillRect(498,408,204,34);
+		if(HostId.length()>0)
+		g.setColor(Color.black);
+		else
+		g.setColor(Color.darkGray);
+		g.fillRect(500,410,200,30);
+		
+		
+		//Connect Button
+		g.setColor(Color.lightGray);
+		g.fillRect(560,475,75,30);
+		g.setColor(Color.black);
+		g.drawRect(560,475,75,30);
+		
+		g.setColor(Color.lightGray);
+		g.fillRect(498,508,204,34);
+		if(typingClient)
+		g.setColor(Color.black);
+		else
+		g.setColor(Color.darkGray);
+		g.fillRect(500,510,200,30);
+		
 		g.setColor(Color.black);
 		g.setFont(script);
 		g.drawString("MAIN MENU",220,100);
@@ -475,6 +507,13 @@ public class Reversi extends Applet implements MouseListener
 		g.drawString("Medium",480,340);
 		g.drawString("Hard",555,340);
 		
+		g.setFont(title);
+		g.drawString("Host",580,400);
+		g.drawString("Connect",562,500);
+		
+		g.setColor(Color.white);
+		g.drawString(HostId,505,435);
+		g.drawString(ClientId,505,535);
     }
 	public void selectMenu(int x, int y) {
 		if (x<125&&x>25&&y<250&&y>200)
@@ -501,6 +540,18 @@ public class Reversi extends Applet implements MouseListener
 		blackdifficulty=medium;
 		if (x<625&&x>550&&y<350&&y>300)
 		blackdifficulty=hard;
+		
+		if (x<625&&x>550&&y<350&&y>300)
+		typingClient = true;
+		else
+		typingClient=false;
+		//Host
+		if (x<635&&x>560&&y<405&&y>375)
+		{
+		int  n = rand.nextInt(999999) + 1000000;
+		HostId=Integer.toString(n);
+		}
+		
 		
 		if (x<475&&x>175&&y<550&&y>450)
 		{
