@@ -19,32 +19,36 @@ import javax.sound.sampled.*;
  
 public class Reversi extends Applet implements MouseListener, KeyListener
 {
-	int fontsize=30;
+	int fontsize=30;									// FONTS
 	Font Enter = new Font("Serif",Font.BOLD,fontsize);
 	Font sub = new Font("Serif",Font.BOLD,10);
 	Font title = new Font("Serif",Font.BOLD,19);
 	Font script = new Font("Serif",Font.BOLD,30);
 	Font Failed = new Font("Serif",Font.ITALIC,80);
 	Font Title = new Font("Serif",Font.BOLD,80);
-	Vector NoteVector;
+	
+													//Custom Color
 	Color Background = new Color(238,	230, 133);
-	//addMouseListener(this);
+	
+	//not Necessary ATM
 	Vector ColorVector;
 	String yourgrapher;
+	
+	//Random generation
 	Random rand = new Random();
-	int xaxislength = 800;
+	int xaxislength = 800;//in case you want need to manipulate somethine based on window size
 	int yaxislength = 600;
 	int clicks = 0;
-	boolean AiPresent=false;
+	boolean AiPresent=false; // self explanitory booleans
 	boolean BothAi = false;
 	boolean nomoves = false;
-	boolean refreshed =false;
-	public static final int apwidth =800;
+	boolean refreshed =false; // for repaint, if not repainted yet, refresh and repaint
+	public static final int apwidth =800; //unchanging values for window size
 	public static final int apheight =600;
 	boolean mouse_clicked=false;
 	boolean typingClient=false;
-	int p=-1;
-	int boardoffset = 100;
+	int p=-1;// this changes the state of the game: -1 = load all values, 0 = reset, 1 = main menu, 2= game.
+	int boardoffset = 100; // Lance uses for the board drawing
 	String HostId = "";
 	String ClientId = "";
 	//pieces
@@ -64,8 +68,9 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	final int medium = 1;
 	final int hard = 2;
 	
+	
 	int board[][] = new int[8][8];
-	int weight[][] = new int[8][8];
+	int weight[][] = new int[8][8];//weight value gets calculated for each position
 	int undoboards[][][] = new int[10][8][8];
 	
 	int wordloc=30; //shifting any words
@@ -84,15 +89,15 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 								{4, -2, 4, 2, 2, 4, -2, 4},
 								{-4, -8, -2, -2, -2, -2, -8, -4},
 								{50, -4, 4, 3, 3, 4, -4, 50}
-								};
+								};  // for Hard mode
 	public void init()
 	{
-		start();
+		start();// start any threads or operations(for later if I use them)
 	}
 	 public static void main(String arg[])throws Exception {
   	{
 	
-  	
+  	//main menu sets up the frame for the application
     
     //Frame frame = new Frame();
 		Frame frame = new Frame();
@@ -111,7 +116,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     frame.show();
   	}
 	}
-	public void keyPressed(KeyEvent evt) 
+	public void keyPressed(KeyEvent evt) //key events
 	{
 	}
 	public void keyReleased(KeyEvent evt)	
@@ -124,7 +129,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	ClientId+=evt.getKeyChar();
 	repaint();
 	}
-	public void mousePressed(MouseEvent e) {
+	public void mousePressed(MouseEvent e) {//mouse events
     }
 
     public void mouseReleased(MouseEvent e) {
@@ -145,7 +150,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     }
 
 
-	public void update(Graphics g) {
+	public void update(Graphics g) {//part of paint, allows for smooth transition of frames. No Flashing.
     Graphics offgc;
     Image offscreen = null;
     Dimension d = size();
@@ -162,9 +167,9 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     // transfer offscreen to window
     g.drawImage(offscreen, 0, 0, this);
     }
-	public void paint(Graphics g)
+	public void paint(Graphics g) // the main function where the magic happens
 	{
-		if(p==-1)
+		if(p==-1)// start up the Listeners (happens once)
 		{
 		addMouseListener(this); 
 		addKeyListener(this); 
@@ -172,7 +177,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		}
 		if(p==0)
 		{
-		System.out.println("Welcome");
+		System.out.println("Welcome");// reset board and all values (happens every time before the main menu)
 			
 			for (int i=0; i < 8; i++)
 				for (int j=0; j < 8; j++)
@@ -185,7 +190,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			p=1;
 			fillundoboards();
 		}
-		if(p==1)
+		if(p==1) // main menu (redrawn every time you click or repaint)
 		{
 		System.out.println("Main Menu");
 		
@@ -196,16 +201,16 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		}
 		drawMenu(g);
 		}
-		if (p==2)
+		if (p==2)//game
 		{
-			if(!gameover()&&mouse_clicked&&isPlayable(mX,mY)&&isTurn(turn))
+			if(!gameover()&&mouse_clicked&&isPlayable(mX,mY)&&isTurn(turn)) //player move
 			{
 			ResetMoveList();
 			for(int i=8;i>=0;i--)
 				for(int j=0;j<7;j++)
 					for(int k=0;k<7;k++)
 					{
-					undoboards[i+1][j][k]=undoboards[i][j][k];
+					undoboards[i+1][j][k]=undoboards[i][j][k];// this loads the state of the board before the move into the undo slot.
 					}
 			for(int j=0;j<7;j++)
 				for(int k=0;k<7;k++)
@@ -219,20 +224,20 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 			ResetMoveList();
 			mouse_clicked=false;
-			}
+			}						// re-evaluate after player moves.
 			drawBoard(g);
 			UndoButton(g,mX,mY);
 			NewGame(g,mX,mY);
 			findMoves();
 			drawPieces(g);	
-			if(!isTurn(turn)&&!gameover())
+			if(!isTurn(turn)&&!gameover()) // if there is an AI present AI goes.
 			{
 			delay(500);
 			for(int i=8;i>=0;i--)
 				for(int j=0;j<7;j++)
 					for(int k=0;k<7;k++)
 					{
-					undoboards[i+1][j][k]=undoboards[i][j][k];
+					undoboards[i+1][j][k]=undoboards[i][j][k]; // this loads the state of the board before the move into the undo slot.
 					}
 			for(int j=0;j<7;j++)
 				for(int k=0;k<7;k++)
@@ -243,7 +248,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			otherturn = otherturn == white ? black : white;
 			turn = turn == white ? black : white;
 			ResetMoveList();
-			}
+			}// re-evaluate after AI moves.
 		
 			drawBoard(g);
 			UndoButton(g,mX,mY);
@@ -271,7 +276,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			}
 		}
 	}
-	public void NewGame (Graphics g, int x, int y) {
+	public void NewGame (Graphics g, int x, int y) { // if the main menu is pressed GRAPHICS
 	
 		g.setColor(Color.darkGray);
 		g.fillRect(548,453,104,44);
@@ -291,7 +296,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		repaint();
 		}
     }
-	public boolean gameover () {
+	public boolean gameover () { // boolean for game over possibility
 		int spaces=0;
 		int movepossibilities = 0;
 		for (int i=0; i<8; i++)
@@ -320,7 +325,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			}
     }
 	
-	public void getWinner (Graphics g) {
+	public void getWinner (Graphics g) { // who won if there is a game over GRAPHICS INVOLVED
 		int spaces=0;
 		int movepossibilities = 0;
 		int blackpieces = 0;
@@ -350,7 +355,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		System.out.println("tie game");
 		}
     }
-	public boolean isPlayable (int x, int y) {
+	public boolean isPlayable (int x, int y) { //if a location is playable (green)
 		x=(x-boardoffset)/50;
 		y=(y-boardoffset)/50;
 		if (x>=0&&x<=7&&y>=0&&y<=7)
@@ -360,8 +365,8 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		}
 			return false;
     }
-	public boolean isTurn (int turn) {
-		if (turn==black&&blackplayer==0)
+	public boolean isTurn (int turn) { // if it is a humans turn
+		if (turn==black&&blackplayer==0) // blackplayer == 0 -> human : 1 -> AI
 		return true;
 		else if(turn==white&&whiteplayer==0)
 		return true;
@@ -370,14 +375,14 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 
     }
 	
-	public void play(int x, int y) {
+	public void play(int x, int y) { // the basic play. change a piece then call the ChangePieces function to apply the move to the board
 	x=(x-boardoffset)/50;
 	y=(y-boardoffset)/50;
 		board[x][y]=turn;
 		System.out.println("ok");
 		ChangePieces(x,y);
     }
-	public void AiPlay() {
+	public void AiPlay() { // the AI moves, calculates the move with the greatest value, then plays there. Board state is then changed.
 	int highestweight = 0;
 	int ivalue = -1;
 	int jvalue = -1;
@@ -415,24 +420,24 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	ChangePieces(ivalue,jvalue);
 	}
     }
-	public void drawMenu(Graphics g) {
+	public void drawMenu(Graphics g) { // draw main menu GRAPHICS
 		g.setColor(Background);
 		g.fillRect(0,0,apwidth,apheight);
 		
 		//White side
 		g.setColor(Color.lightGray);
-		g.fillRect(25,200,200,50);
-		g.fillRect(25,300,225,50);
+		g.fillRect(25,200,200,50);//human/AI
+		g.fillRect(25,300,225,50);//easy med hard
 		
 		g.setColor(Color.darkGray);
-		g.fillRect(25+100*whiteplayer,200,100,50);
-		g.fillRect(25+75*whitedifficulty,300,75,50);
+		g.fillRect(25+100*whiteplayer,200,100,50);//which option for human/ai is selected
+		g.fillRect(25+75*whitedifficulty,300,75,50);// option for difficulty
 		
 		g.setColor(Color.black);
-		g.drawRect(25,200,100,50);
+		g.drawRect(25,200,100,50); //outline for player options
 		g.drawRect(125,200,100,50);
 		
-		g.drawRect(25,300,75,50);
+		g.drawRect(25,300,75,50); // outline for difficulty options
 		g.drawRect(100,300,75,50);
 		g.drawRect(175,300,75,50);
 		
@@ -487,7 +492,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		g.setColor(Color.darkGray);
 		g.fillRect(500,510,200,30);
 		
-		g.setColor(Color.black);
+		g.setColor(Color.black); // All the words.
 		g.setFont(script);
 		g.drawString("MAIN MENU",220,100);
 		g.drawString("WHITE",30,170);
@@ -515,7 +520,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		g.drawString(HostId,505,435);
 		g.drawString(ClientId,505,535);
     }
-	public void selectMenu(int x, int y) {
+	public void selectMenu(int x, int y) { // how the mouse selects the main menu (GRAPHICS)
 		if (x<125&&x>25&&y<250&&y>200)
 		whiteplayer = human;
 		if (x<225&&x>125&&y<250&&y>200)
@@ -553,16 +558,16 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		}
 		
 		
-		if (x<475&&x>175&&y<550&&y>450)
+		if (x<475&&x>175&&y<550&&y>450) // if play is pressed
 		{
 			if (blackplayer==Ai||whiteplayer==Ai)
 			AiPresent=true;
 			if (blackplayer==Ai&&whiteplayer==Ai)
 			BothAi=true;
-		p=2;
+		p=2;// change game state.
 		}
     }
-	public void drawBoard(Graphics g) {
+	public void drawBoard(Graphics g) { // draw the game board (GRAPHICS)
 		g.setColor(Background);
 		g.fillRect(0,0,apwidth,apheight);
 		g.setColor(Color.black);
@@ -574,7 +579,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		}
 
     }
-	public void UndoButton(Graphics g,int x,int y) {
+	public void UndoButton(Graphics g,int x,int y) { // undo (GRAPHICS)
 	boolean difference = false;
 	int iterator=1;
 		g.setColor(Color.darkGray);
@@ -620,7 +625,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		}
 		
     }
-	public void drawPieces(Graphics g) {
+	public void drawPieces(Graphics g) { // draw all the pieces on the board (GRAPHICS)
 		for (int i=0; i<8; i++)
 			for (int j=0; j<8; j++)
 			{
@@ -641,7 +646,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			}
 			}
     }
-	public void findMoves() {
+	public void findMoves() { // find green pieces for every piece you own
 		for (int i=0; i<8; i++)
 			for (int j=0; j<8; j++)
 			{
@@ -652,7 +657,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 				}
 			}
     }
-	public void ResetMoveList() {
+	public void ResetMoveList() { // changes all green to blank
 		for (int i=0; i<8; i++)
 			for (int j=0; j<8; j++)
 			{
@@ -662,7 +667,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 				}
 			}
     }
-	public void ChangePieces(int i,int j) {
+	public void ChangePieces(int i,int j) { // applies transformation after move is played, check every direction around the piece and apply the correct color to it
 		//left
 		int resetj=j;
 		int reseti=i;
@@ -869,7 +874,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		}	
     }
 	
-	public void setMoves(int i,int j) {
+	public void setMoves(int i,int j) { // just like change pieces, finds all directions around a piece and finds possible moves
 		//left
 		int resetj=j;
 		int reseti=i;
@@ -975,7 +980,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			j=resetj;
 		}	
     }
-	public int getWeight(int i, int j)
+	public int getWeight(int i, int j) // finds the wieght of any move by the number of pieces it will take in every direction and the other alogrithms
 	{
 	//left
 		int resetj=j;
@@ -1118,18 +1123,18 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	return counter;
 	}
 	
-	public int applyHard(int i, int j)
+	public int applyHard(int i, int j) // applies the weights of the board to a move
 	{
 		return weights[i][j];
 	}
-	public boolean isCorner(int i, int j)
+	public boolean isCorner(int i, int j) // returns if the tile is a corner (good)
 	{
 		if((i==0&&j==0)||(i==0&&j==7)||(i==7&&j==0)||(i==7&&j==7))
 		return true;
 		return false;
 	}
 	
-	public boolean isSubCorner(int i, int j)
+	public boolean isSubCorner(int i, int j) // returns if the tile touches a corner (bad)
 	{
 		if((i==1&&j==0)||(i==1&&j==7)||(i==7&&j==1)||(i==7&&j==6)||(i==1&&j==1)||(i==1&&j==6)||(i==6&&j==0)||(i==6&&j==7)||(i==0&&j==1)||(i==0&&j==6)||(i==6&&j==1)||(i==6&&j==6))
 		return true;
@@ -1138,7 +1143,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	
 	
 	
-    	public void fillundoboards()
+    	public void fillundoboards() // preload undo boards with the beginnning state
 		{
 		for(int i=0;i<10;i++)
 			for(int j=0;j<7;j++)
@@ -1147,7 +1152,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 				undoboards[i][j][k]=board[j][k];
 				}
 		}
-    public void delay(double n)
+    public void delay(double n) // for a delay
 	{
 		long startDelay = System.currentTimeMillis();
 		long endDelay = 0;
