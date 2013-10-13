@@ -19,121 +19,121 @@ import javax.sound.sampled.*;
  
 public class Reversi extends Applet implements MouseListener, KeyListener
 {
-	int fontsize=30;									// FONTS
-	Font Enter = new Font("Serif",Font.BOLD,fontsize);
-	Font sub = new Font("Serif",Font.BOLD,10);
-	Font title = new Font("Serif",Font.BOLD,19);
-	Font script = new Font("Serif",Font.BOLD,30);
-	Font Failed = new Font("Serif",Font.ITALIC,80);
-	Font Title = new Font("Serif",Font.BOLD,80);
-	
-													//Custom Color
-	Color Background = new Color(238,	230, 133);
-	
-	//not Necessary ATM
-	Vector ColorVector;
-	String yourgrapher;
-	
-	//Random generation
-	Random rand = new Random();
-	int xaxislength = 800;//in case you want need to manipulate somethine based on window size
-	int yaxislength = 600;
-	int clicks = 0;
-	boolean AiPresent=false; // self explanitory booleans
-	boolean BothAi = false;
-	boolean nomoves = false;
-	boolean refreshed =false; // for repaint, if not repainted yet, refresh and repaint
-	public static final int apwidth =800; //unchanging values for window size
-	public static final int apheight =600;
-	boolean mouse_clicked=false;
-	boolean typingClient=false;
-	int p=-1;// this changes the state of the game: -1 = load all values, 0 = reset, 1 = main menu, 2= game.
-	int boardoffset = 100; // Lance uses for the board drawing
-	String HostId = "";
-	String ClientId = "";
-	//pieces
-	final int blank = 0; 
-	final int black = 1;  
-	final int white = 2; 
-	final int green = 3;
-	//players
-	int whiteplayer=0;
-	int blackplayer=0;
-	final int human = 0;
-	final int Ai = 1;
-	//difficulties
-	int blackdifficulty = 0;
-	int whitedifficulty = 0;
-	final int easy = 0;
-	final int medium = 1;
-	final int hard = 2;
-	
-	
-	int board[][] = new int[8][8];
-	int weight[][] = new int[8][8];//weight value gets calculated for each position
-	int undoboards[][][] = new int[10][8][8];
-	
-	int wordloc=30; //shifting any words
-	
-	int turn = black;
-	int otherturn = white;
-	int mX = 0;//clicked
-	int mY = 0;
-	int[][] weights = new int[][]
-								{
-								{50, -4, 4, 3, 3, 4, -4, 50},
-								{-4, -8, -2, -2, -2, -2, -8, -4},
-								{4, -2, 4, 2, 2, 4, -2, 4},
-								{3, -2, 2, 0, 0, 2, -2, 3},
-								{3, -2, 2, 0, 0, 2, -2, 3},
-								{4, -2, 4, 2, 2, 4, -2, 4},
-								{-4, -8, -2, -2, -2, -2, -8, -4},
-								{50, -4, 4, 3, 3, 4, -4, 50}
-								};  // for Hard mode
-	public void init()
-	{
-		start();// start any threads or operations(for later if I use them)
-	}
-	 public static void main(String arg[])throws Exception {
-  	{
-	
-  	//main menu sets up the frame for the application
-    
-    //Frame frame = new Frame();
-		Frame frame = new Frame();
-		Applet applet = new Reversi();
-		frame.addWindowListener(new WindowAdapter()
-		{
-		public void windowClosing(WindowEvent e)
-			{
-				System.exit(0);
-			}	
-		});
+    int fontsize=30;									// FONTS
+    Font Enter = new Font("Serif",Font.BOLD,fontsize);
+    Font sub = new Font("Serif",Font.BOLD,10);
+    Font title = new Font("Serif",Font.BOLD,19);
+    Font script = new Font("Serif",Font.BOLD,30);
+    Font Failed = new Font("Serif",Font.ITALIC,80);
+    Font Title = new Font("Serif",Font.BOLD,80);
 
-    frame.add(applet);
-    frame.setSize(apwidth,apheight);
-	
-    frame.show();
-  	}
-	}
-	public void keyPressed(KeyEvent evt) //key events
-	{
-	}
-	public void keyReleased(KeyEvent evt)	
-	{
-	}
-	public void keyTyped(KeyEvent evt)		
-	{
-	int key=0; key = evt.getKeyCode(); 
-	if(typingClient)
-	ClientId+=evt.getKeyChar();
-	repaint();
-	}
-	public void mousePressed(MouseEvent e) {//mouse events
+                                                                                                    //Custom Color
+    Color Background = new Color(238,	230, 133);
+
+    //not Necessary ATM
+    Vector ColorVector;
+    String yourgrapher;
+
+    //Random generation
+    Random rand = new Random();
+    int xaxislength = 800;//in case you want need to manipulate somethine based on window size
+    int yaxislength = 600;
+    int clicks = 0;
+    boolean AiPresent=false; // self explanitory booleans
+    boolean BothAi = false;
+    boolean nomoves = false;
+    boolean refreshed =false; // for repaint, if not repainted yet, refresh and repaint
+    public static final int apwidth =800; //unchanging values for window size
+    public static final int apheight =600;
+    boolean mouse_clicked=false;
+    boolean typingClient=false;
+    int p=-1;// this changes the state of the game: -1 = load all values, 0 = reset, 1 = main menu, 2= game.
+    int boardoffset = 100; // Lance uses for the board drawing
+    String HostId = "";
+    String ClientId = "";
+    //pieces
+    final int blank = 0; 
+    final int black = 1;  
+    final int white = 2; 
+    final int green = 3;
+    //players
+    int whiteplayer=0;
+    int blackplayer=0;
+    final int human = 0;
+    final int Ai = 1;
+    //difficulties
+    int blackdifficulty = 0;
+    int whitedifficulty = 0;
+    final int easy = 0;
+    final int medium = 1;
+    final int hard = 2;
+
+
+    int board[][] = new int[8][8];
+    int weight[][] = new int[8][8];//weight value gets calculated for each position
+    int undoboards[][][] = new int[10][8][8];
+
+    int wordloc=30; //shifting any words
+
+    int turn = black;
+    int otherturn = white;
+    int mX = 0;//clicked
+    int mY = 0;
+    int[][] weights = new int[][]
+                                                            {
+                                                            {50, -4, 4, 3, 3, 4, -4, 50},
+                                                            {-4, -8, -2, -2, -2, -2, -8, -4},
+                                                            {4, -2, 4, 2, 2, 4, -2, 4},
+                                                            {3, -2, 2, 0, 0, 2, -2, 3},
+                                                            {3, -2, 2, 0, 0, 2, -2, 3},
+                                                            {4, -2, 4, 2, 2, 4, -2, 4},
+                                                            {-4, -8, -2, -2, -2, -2, -8, -4},
+                                                            {50, -4, 4, 3, 3, 4, -4, 50}
+                                                            };  // for Hard mode
+    public void init()
+    {
+            start();// start any threads or operations(for later if I use them)
+    }
+    public static void main(String arg[])throws Exception {
+    { //repetitive braces?
+        //main menu sets up the frame for the application
+
+        //Frame frame = new Frame();
+        Frame frame = new Frame();
+        Applet applet = new Reversi();
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }	
+        });
+
+        frame.add(applet);
+        frame.setSize(apwidth,apheight);
+
+        frame.show();
+        ReversiServer reversiServer = new ReversiServer();
+        ReversiClient reversiClient = new ReversiClient();
+    }//repetitive braces?
+
+    }
+    public void keyPressed(KeyEvent evt) //key events
+    {
+    }
+    public void keyReleased(KeyEvent evt)	
+    {
+    }
+    public void keyTyped(KeyEvent evt)		
+    {
+        int key=0; key = evt.getKeyCode(); 
+        if(typingClient)
+        ClientId+=evt.getKeyChar();
+        repaint();
+    }
+    public void mousePressed(MouseEvent e) {//mouse events
     }
 
     public void mouseReleased(MouseEvent e) {
-    }
+    }  
 
     public void mouseEntered(MouseEvent e) {
     }
@@ -142,15 +142,15 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     }
 
     public void mouseClicked(MouseEvent e) {
-		mX = e.getX();
-    	mY = e.getY();
+        mX = e.getX();
+        mY = e.getY();
         mouse_clicked=true;
-	    //System.out.println("uhoh");
-	    repaint();
+            //System.out.println("uhoh");
+            repaint();
     }
 
 
-	public void update(Graphics g) {//part of paint, allows for smooth transition of frames. No Flashing.
+    public void update(Graphics g) {//part of paint, allows for smooth transition of frames. No Flashing.
     Graphics offgc;
     Image offscreen = null;
     Dimension d = size();
