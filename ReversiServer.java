@@ -11,25 +11,32 @@ public class ReversiServer {
     private PrintWriter out;
     private BufferedReader in;
     
+    public String hostname;
     //TODO:
     //process method
     //  will call stuff on reversi
     
     //probably give this constructor arguments for hostname and port number
-    public ReversiServer() throws IOException {
-        //server socket
-        //TODO: port number needs to be inputted
+    public ReversiServer(String port) throws IOException {
+        
+        //set up server socket
+        int portint = Integer.parseInt(port);
         try {
-            serversocket = new ServerSocket(4444);
-            String serveraddress = serversocket.getInetAddress().getHostName(); 
-            System.out.println(serveraddress); //shows hostname
+            //use constructor with IP address and port
+            serversocket = new ServerSocket(portint);
+            hostname = serversocket.getInetAddress().getHostName(); 
+            System.out.println("Hostname: " + hostname);
+            System.out.println("Port: " + port);
+            if (serversocket.isBound())
+                System.out.println("Socket serversocket is bound");
         } catch (IOException e) {
-            System.err.println("Couldn't listen on port 4444");
+            System.err.println("Couldn't listen on port " + port);
             System.exit(1);
         }
         //client socket
         try {
             clientsocket = serversocket.accept();
+            
         } catch (IOException e) {
             System.err.println("Couldn't accept connection");
             System.exit(1);
@@ -40,7 +47,7 @@ public class ReversiServer {
         String input, output;
         
         //output = process input
-        
+        out.println("Testing, do you get this client?");
         while ((input = in.readLine()) != null) {
             //output = process input
             //out.println(output);

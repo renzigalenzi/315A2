@@ -12,10 +12,14 @@ public class ReversiClient {
     private BufferedReader cmdin;
     
     //probably give this constructor arguments for hostname and port number
-    public ReversiClient() throws IOException {
+    public ReversiClient(String hostname, String port) throws IOException {
+        int portint = Integer.parseInt(port);
         //setup shtuff
         try {
-            localsocket = new Socket("hostname", 4444);
+            localsocket = new Socket(hostname, portint);
+            if (localsocket.isBound())
+                System.out.println("Socket localsocket is bound to " + hostname + " and port " + port);
+            else System.out.println("localsocket not bound?...");
             out = new PrintWriter(localsocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(localsocket.getInputStream()));
         } catch (UnknownHostException e) {

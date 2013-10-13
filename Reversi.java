@@ -49,8 +49,9 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     boolean typingClient=false;
     int p=-1;// this changes the state of the game: -1 = load all values, 0 = reset, 1 = main menu, 2= game.
     int boardoffset = 100; // Lance uses for the board drawing
-    String HostId = "";
-    String ClientId = "";
+    public static String HostId = ""; //set by field and Host button
+    public static String ClientId = ""; //set by field and Connect button
+    public static String PortId = ""; //TODO: add fields for Port under Host and Connect
     //pieces
     final int blank = 0; 
     final int black = 1;  
@@ -111,8 +112,18 @@ public class Reversi extends Applet implements MouseListener, KeyListener
         frame.setSize(apwidth,apheight);
 
         frame.show();
-        ReversiServer reversiServer = new ReversiServer();
-        ReversiClient reversiClient = new ReversiClient();
+        
+        // temp values for testing
+        //HostId = "quizzical";
+        //ClientId = "quizzical";
+        PortId = "4444";
+        
+        // have an if statement to choose which to start based on if Host or
+        // Connect button is pressed, perhaps set a global bool?
+        ReversiServer reversiServer = new ReversiServer(PortId);
+        System.out.println("is it not getting here?");
+        HostId = reversiServer.hostname;
+        ReversiClient reversiClient = new ReversiClient(HostId, PortId);
     }//repetitive braces?
 
     }
