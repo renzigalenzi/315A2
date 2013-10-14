@@ -43,6 +43,8 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     boolean BothAi = false;
     boolean nomoves = false;
     boolean refreshed =false; // for repaint, if not repainted yet, refresh and repaint
+	boolean hostconnected = false;
+	boolean clientconnected = false;
     public static final int apwidth =800; //unchanging values for window size
     public static final int apheight =600;
     boolean mouse_clicked=false;
@@ -51,7 +53,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     int boardoffset = 100; // Lance uses for the board drawing
     public static String HostId = ""; //set by field and Host button
     public static String ClientId = ""; //set by field and Connect button
-    public static String PortId = ""; //TODO: add fields for Port under Host and Connect
+    public static String PortId = "4444"; //TODO: add fields for Port under Host and Connect
     //pieces
     final int blank = 0; 
     final int black = 1;  
@@ -68,7 +70,8 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     final int easy = 0;
     final int medium = 1;
     final int hard = 2;
-
+	ReversiServer reversiServer;
+    ReversiClient reversiClient;
 
     int board[][] = new int[8][8];
     int weight[][] = new int[8][8];//weight value gets calculated for each position
@@ -117,13 +120,13 @@ public class Reversi extends Applet implements MouseListener, KeyListener
         //HostId = "quizzical";
         //ClientId = "quizzical";
         PortId = "4444";
-        
+		
         // have an if statement to choose which to start based on if Host or
         // Connect button is pressed, perhaps set a global bool?
-        ReversiServer reversiServer = new ReversiServer(PortId);
+        /*ReversiServer reversiServer = new ReversiServer(PortId);
         System.out.println("is it not getting here?");
         HostId = reversiServer.hostname;
-        ReversiClient reversiClient = new ReversiClient(HostId, PortId);
+        ReversiClient reversiClient = new ReversiClient(HostId, PortId);*/
     }//repetitive braces?
 
     }
@@ -528,8 +531,10 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		g.drawString("Connect",562,500);
 		
 		g.setColor(Color.white);
-		g.drawString(HostId,505,435);
-		g.drawString(ClientId,505,535);
+		if(hostconnected)
+		g.drawString(PortId,505,435);
+		if(clientconnected)
+		g.drawString(PortId,505,535);
     }
 	public void selectMenu(int x, int y) { // how the mouse selects the main menu (GRAPHICS)
 		if (x<125&&x>25&&y<250&&y>200)
@@ -557,17 +562,28 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		if (x<625&&x>550&&y<350&&y>300)
 		blackdifficulty=hard;
 		
-		if (x<625&&x>550&&y<350&&y>300)
-		typingClient = true;
+		if (x<635&&x>560&&y<505&&y>475)
+		try{
+			reversiClient = new ReversiClient(HostId, PortId);
+			clientconnected = true;
+			}catch(IOException e){
+				e.printStackTrace();
+			}
 		else
 		typingClient=false;
 		//Host
 		if (x<635&&x>560&&y<405&&y>375)
 		{
-		int  n = rand.nextInt(999999) + 1000000;
-		HostId=Integer.toString(n);
+		try{
+			reversiServer = new ReversiServer(PortId);
+			hostconnected = true;
+			System.out.println("is it not getting here?");
+			HostId = reversiServer.hostname;
+			}catch(IOException e){
+				e.printStackTrace();
+			}
 		}
-		
+		//System.out.println("is it not getting here?");
 		
 		if (x<475&&x>175&&y<550&&y>450) // if play is pressed
 		{
