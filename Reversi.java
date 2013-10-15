@@ -94,11 +94,27 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			{-4, -8, -2, -2, -2, -2, -8, -4},
 			{50, -4, 4, 3, 3, 4, -4, 50}
 		};  // for Hard mode
-		
+	
+	public Reversi() {
+		//Frame frame = new Frame();
+        Frame frame = new Frame();
+        Applet applet = new Reversi();
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }	
+        });
+
+        frame.add(applet);
+        frame.setSize(apwidth,apheight);
+        frame.show();
+	}
+	
     public void init() {
         start();// start any threads or operations(for later if I use them)
     }
 	
+	/*
     public static void main(String arg[])throws Exception {
         //main menu sets up the frame for the application
 
@@ -123,11 +139,12 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
         // have an if statement to choose which to start based on if Host or
         // Connect button is pressed, perhaps set a global bool?
-        /*ReversiServer reversiServer = new ReversiServer(PortId);
+        ReversiServer reversiServer = new ReversiServer(PortId);
         System.out.println("is it not getting here?");
         HostId = reversiServer.hostname;
-        ReversiClient reversiClient = new ReversiClient(HostId, PortId);*/
+        ReversiClient reversiClient = new ReversiClient(HostId, PortId);
     }
+	*/
 	
     public void keyPressed(KeyEvent evt) //key events
     {    }
