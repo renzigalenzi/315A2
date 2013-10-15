@@ -94,7 +94,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			{-4, -8, -2, -2, -2, -2, -8, -4},
 			{50, -4, 4, 3, 3, 4, -4, 50}
 		};  // for Hard mode
-	
+	/*
 	public Reversi() {
 		//Frame frame = new Frame();
         Frame frame = new Frame();
@@ -108,7 +108,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
         frame.add(applet);
         frame.setSize(apwidth,apheight);
         frame.show();
-	}
+	}*/
 	
     public void init() {
         start();// start any threads or operations(for later if I use them)
@@ -564,6 +564,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		if (x<625&&x>550&&y<350&&y>300)
 			blackdifficulty=hard;
 		//start as client
+		/*
 		if (x<635&&x>560&&y<505&&y>475)
 			try{
 				reversiClient = new ReversiClient(HostId, PortId);
@@ -583,7 +584,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 				}catch(IOException e){
 					e.printStackTrace();
 				}
-		}
+		}*/
 		//System.out.println("is it not getting here?");
 		
 		if (x<475&&x>175&&y<550&&y>450) { // if play is pressed

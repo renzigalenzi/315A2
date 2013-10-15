@@ -1,11 +1,21 @@
+import java.io.*;
 import java.io.PrintWriter;
 import java.io.BufferedReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.*;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import javax.swing.*;
+import java.applet.*;
+import java.awt.*;
+import java.util.*;
+import java.util.Random;
+import java.awt.event.*;
+import java.lang.Math;
+import java.awt.image.*;
 
 public class ReversiServer {
     private ServerSocket serversocket;
@@ -16,13 +26,11 @@ public class ReversiServer {
     public static String hostname;
 	public static String portnumber;
 	
-	public Reversi reversi;
+	public static Reversi reversi;
 	
-    //TODO:
-    //process input method
-    //    will call stuff on reversi
-    
-    //probably give this constructor arguments for hostname and port number
+	public static final int apwidth =800; //unchanging values for window size
+    public static final int apheight =600;
+	
     public ReversiServer(String host, String port) throws IOException {
         hostname = host;
 		
@@ -46,7 +54,7 @@ public class ReversiServer {
         //client socket
         try {
             clientsocket = serversocket.accept();
-            
+            System.out.println("Connected to client");
         } catch (IOException e) {
             System.err.println("Couldn't accept connection");
             System.exit(1);
@@ -56,7 +64,9 @@ public class ReversiServer {
         in = new BufferedReader(new InputStreamReader(clientsocket.getInputStream()));
         String input, output;
         
-		reversi = new Reversi();
+		System.out.println("made in and out");
+		
+		//reversi = new Reversi();
 		
         //output = process input
         out.println("Testing, do you get this client?");
@@ -81,6 +91,20 @@ public class ReversiServer {
 	public static void main(String args[]) throws Exception {
 		hostname = JOptionPane.showInputDialog(null, "Enter hostname", 1);
 		portnumber = JOptionPane.showInputDialog(null, "Enter the port number", 1);
+		
+		//Frame frame = new Frame();
+        Frame frame = new Frame();
+        Applet applet = new Reversi();
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }	
+        });
+
+        frame.add(applet);
+        frame.setSize(apwidth,apheight);
+        frame.show();
+		
 		ReversiServer server = new ReversiServer(hostname, portnumber);
 	}
 }
