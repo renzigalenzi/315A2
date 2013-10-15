@@ -15,7 +15,11 @@ import java.awt.event.*;
 import java.lang.Math;
 import java.awt.image.*;
 
-
+/** 
+ *	Lance Elliott
+ *  Ross Hudgins
+	Edgardo Angel
+ **/
 
 public class ReversiClient {
     private Socket localsocket;
@@ -55,8 +59,9 @@ public class ReversiClient {
         cmdin = new BufferedReader(new InputStreamReader(System.in));
         String fromserver, fromcmd, output;
         
+		out.println("this is from the client");
         while ((fromserver = in.readLine()) != null) {
-            System.out.println("Server says: " + fromserver);
+            System.out.println("fromserver: " + fromserver);
             //if fromserver.equals("exit command")
             //break
 			
@@ -65,7 +70,7 @@ public class ReversiClient {
 			
             fromcmd = cmdin.readLine();
             if (fromcmd != null) {
-                System.out.println("Client: " + fromcmd);
+                System.out.println("Client's fromcmd: " + fromcmd);
                 out.println(fromcmd);
             }
         }

@@ -17,23 +17,31 @@ import java.awt.event.*;
 import java.lang.Math;
 import java.awt.image.*;
 
+/** 
+ *	Lance Elliott
+ *  Ross Hudgins
+	Edgardo Angel
+ **/
+
 public class ReversiServer {
     private ServerSocket serversocket;
     private Socket clientsocket;
     private PrintWriter out;
     private BufferedReader in;
+	private BufferedReader cmdin;
     
     public static String hostname;
 	public static String portnumber;
 	
 	public static Reversi reversi;
+	public static Applet reversiapplet;
 	
 	public static final int apwidth =800; //unchanging values for window size
     public static final int apheight =600;
 	
     public ReversiServer(String host, String port) throws IOException {
-        hostname = host;
 		
+		hostname = host;
 		portnumber = port;
         //set up server socket
         int portint = Integer.parseInt(portnumber);
@@ -62,19 +70,25 @@ public class ReversiServer {
         //in and out
         out = new PrintWriter(clientsocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(clientsocket.getInputStream()));
-        String input, output;
+        cmdin = new BufferedReader(new InputStreamReader(System.in));
+		String fromclient, output, fromcmd;
         
 		System.out.println("made in and out");
 		
-		//reversi = new Reversi();
-		
         //output = process input
         out.println("Testing, do you get this client?");
-        while ((input = in.readLine()) != null) {
-            output = processinput(input);
+        while ((fromclient = in.readLine()) != null) {
+            System.out.println("fromclient: " + fromclient);
+			output = processinput(fromclient);
             out.println(output);
 //            if (output.equalsIgnoreCase("whatever the exit command is"))
 //                break;
+
+			fromcmd = cmdin.readLine();
+            if (fromcmd != null) {
+                System.out.println("Server: " + fromcmd);
+                out.println(fromcmd);
+            }
         }
         //close stuff, obviously
         out.close();
@@ -94,14 +108,15 @@ public class ReversiServer {
 		
 		//Frame frame = new Frame();
         Frame frame = new Frame();
-        Applet applet = new Reversi();
+        //Applet applet = new Reversi();
+		reversiapplet = new Reversi();
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 System.exit(0);
             }	
         });
 
-        frame.add(applet);
+        frame.add(reversiapplet);
         frame.setSize(apwidth,apheight);
         frame.show();
 		

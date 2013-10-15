@@ -12,11 +12,10 @@ import javax.sound.sampled.*;
 
 /** 
  *	Lance Elliott
- *  
+ *  Ross Hudgins
+	Edgardo Angel
  **/
 
-
- 
 public class Reversi extends Applet implements MouseListener, KeyListener
 {
     int fontsize=30;									// FONTS
@@ -49,7 +48,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     public static final int apheight =600;
     boolean mouse_clicked=false;
     boolean typingClient=false;
-    int p=-1;// this changes the state of the game: -1 = load all values, 0 = reset, 1 = main menu, 2= game.
+    public static int p=-1;// this changes the state of the game: -1 = load all values, 0 = reset, 1 = main menu, 2= game.
     int boardoffset = 100; // Lance uses for the board drawing
     public static String HostId = ""; //set by field and Host button
     public static String ClientId = ""; //set by field and Connect button
