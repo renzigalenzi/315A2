@@ -71,28 +71,28 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     final int hard = 2;
 	ReversiServer reversiServer;
     ReversiClient reversiClient;
-
+	int forwardturns = 0;
     int board[][] = new int[8][8];
     int weight[][] = new int[8][8];//weight value gets calculated for each position
     int undoboards[][][] = new int[10][8][8];
 
     int wordloc=30; //shifting any words
-
+	int turnchecker = 0;
     int turn = black;
     int otherturn = white;
     int mX = 0;//clicked
     int mY = 0;
     int[][] weights = new int[][]
 		{
-			{50, -4, 4, 3, 3, 4, -4, 50},
-			{-4, -8, -2, -2, -2, -2, -8, -4},
-			{4, -2, 4, 2, 2, 4, -2, 4},
-			{3, -2, 2, 0, 0, 2, -2, 3},
-			{3, -2, 2, 0, 0, 2, -2, 3},
-			{4, -2, 4, 2, 2, 4, -2, 4},
-			{-4, -8, -2, -2, -2, -2, -8, -4},
-			{50, -4, 4, 3, 3, 4, -4, 50}
-		};  // for Hard mode
+{99, -40, 8, 6, 6, 8, -40, 99},
+{-40, -24, -4, -3, -3, -4, -24, -40},
+{8, -4, 7, 4, 4, 7, -4, 8},
+{6, -3, 4, 0, 0, 4, -3, 6},
+{6, -3, 4, 0, 0, 4, -3, 6},
+{8, -4, 7, 4, 4, 7, -4, 8},
+{-40, -24, -4, -3, -3, -4, -24, -40},
+{99, -40, 8, 6, 6, 8, -40, 99},
+}; // for Hard mode
 	/*
 	public Reversi() {
 		//Frame frame = new Frame();
@@ -232,12 +232,12 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			if(!gameover()&&mouse_clicked&&isPlayable(mX,mY)&&isTurn(turn)) { //player move
 				ResetMoveList();
 				for(int i=8;i>=0;i--)
-					for(int j=0;j<7;j++)
-						for(int k=0;k<7;k++) {
+					for(int j=0;j<8;j++)
+						for(int k=0;k<8;k++) {
 							undoboards[i+1][j][k]=undoboards[i][j][k];// this loads the state of the board before the move into the undo slot.
 						}
-				for(int j=0;j<7;j++)
-					for(int k=0;k<7;k++)
+				for(int j=0;j<8;j++)
+					for(int k=0;k<8;k++)
 					{
 						undoboards[0][j][k]=board[j][k];
 					}
@@ -257,14 +257,14 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			drawPieces(g);	
 			
 			if(!isTurn(turn)&&!gameover()) { // if there is an AI present AI goes.
-				delay(500);
+				delay(5);
 				for(int i=8;i>=0;i--)
-					for(int j=0;j<7;j++)
-						for(int k=0;k<7;k++) {
+					for(int j=0;j<8;j++)
+						for(int k=0;k<8;k++) {
 							undoboards[i+1][j][k]=undoboards[i][j][k]; // this loads the state of the board before the move into the undo slot.
 						}
-				for(int j=0;j<7;j++)
-					for(int k=0;k<7;k++) {
+				for(int j=0;j<8;j++)
+					for(int k=0;k<8;k++) {
 						undoboards[0][j][k]=board[j][k];
 					}
 				AiPlay();
@@ -401,8 +401,8 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		ChangePieces(x,y);
     }
 	
-	public void AiPlay() { // the AI moves, calculates the move with the greatest value, then plays there. Board state is then changed.
-		int highestweight = 0;
+	public int AiPlay() { // the AI moves, calculates the move with the greatest value, then plays there. Board state is then changed.
+		int highestweight = -100;
 		int ivalue = -1;
 		int jvalue = -1;
 		int tempweight = 0;
@@ -427,11 +427,12 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 					}	
 				}
 			}
-		System.out.println("highest weight was "+highestweight+" from "+ivalue+" "+jvalue);
+		System.out.println(turn == black ? "highest weight for black was "+highestweight+" from "+ivalue+" "+jvalue : "highest weight for white was "+highestweight+" from "+ivalue+" "+jvalue);
 		if (ivalue>=0&&jvalue>=0) {
 			board[ivalue][jvalue]=turn;
 			ChangePieces(ivalue,jvalue);
 		}
+		return highestweight;
     }
 	
 	public void drawMenu(Graphics g) { // draw main menu GRAPHICS
@@ -607,7 +608,6 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     }
 	
 	public void UndoButton(Graphics g,int x,int y) { // undo (GRAPHICS)
-		boolean difference = false;
 		int iterator=1;
 		g.setColor(Color.darkGray);
 		g.fillRect(548,353,104,44);
@@ -624,10 +624,17 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 				System.out.println("doubles");
 			}
 			for(int it=0;it<iterator;it++) {
+				UndoMove();
+			}
+		}
+    }
+	public void UndoMove()
+	{
+	boolean difference = false;
 				System.out.println("undo");
 				ResetMoveList();
-				for(int j=0;j<7;j++)
-					for(int k=0;k<7;k++) {
+				for(int j=0;j<8;j++)
+					for(int k=0;k<8;k++) {
 						if (board[j][k]!=undoboards[0][j][k])
 							difference=true;
 						board[j][k]=undoboards[0][j][k];
@@ -637,15 +644,12 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 					turn = turn == white ? black : white;
 				}
 				for(int i=0;i<9;i++)
-					for(int j=0;j<7;j++)
-						for(int k=0;k<7;k++) {
+					for(int j=0;j<8;j++)
+						for(int k=0;k<8;k++) {
 							undoboards[i][j][k]=undoboards[i+1][j][k];
 						}
 				ResetMoveList();
-			}
-		}
-    }
-	
+	}
 	public void drawPieces(Graphics g) { // draw all the pieces on the board (GRAPHICS)
 		for (int i=0; i<8; i++)
 			for (int j=0; j<8; j++) {
@@ -1086,8 +1090,44 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		return counter;
 	}
 	
-	public int applyHard(int i, int j) { // applies the weights of the board to a move
-		return weights[i][j];
+	public int applyHard(int ival, int jval) { // applies the weights of the board to a move
+	double calculation=0;
+	int saveddifficulty=otherturn == white ? whitedifficulty : blackdifficulty; // save both current difficulties
+	int currentdifficulty = turn == white ? whitedifficulty : blackdifficulty; 
+	whitedifficulty=currentdifficulty; // for calculating, assume the other AI thinks like you, both AI are set to the current thinkers level
+	blackdifficulty = currentdifficulty;
+		if (forwardturns==0)//while you are not already looking ahead
+		{
+		while(forwardturns < 1)//look ahead this many
+		{
+		forwardturns++;
+		board[ival][jval]=turn;// apply the current move
+		ChangePieces(ival,jval);//apply
+		otherturn = otherturn == white ? black : white;//next turn
+		turn = turn == white ? black : white;
+		ResetMoveList();//find that turns moves.
+		findMoves();
+		calculation -= AiPlay()/2;//calculate the highest possible score they have
+		//System.out.println(calculation);
+		otherturn = otherturn == white ? black : white;//next turn
+		turn = turn == white ? black : white;
+		
+		}
+		
+		for(int j=0;j<8;j++)
+					for(int k=0;k<8;k++) {
+						board[j][k]=undoboards[0][j][k];
+						}
+		forwardturns=0;
+		}
+		//System.out.println(turn + "white = " + white);
+		
+		ResetMoveList();
+		findMoves();
+		if(otherturn == white) whitedifficulty=saveddifficulty; else blackdifficulty=saveddifficulty;
+		calculation +=weights[ival][jval];
+		return (int)calculation;
+		
 	}
 	
 	public boolean isCorner(int i, int j) { // returns if the tile is a corner (good)
