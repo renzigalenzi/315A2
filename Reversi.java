@@ -9,6 +9,8 @@ import java.util.Random;
 import java.awt.event.*;
 import java.lang.Math;
 import javax.sound.sampled.*;
+import java.awt.geom.*;
+import java.awt.MultipleGradientPaint.*;
 
 /** 
  *	Lance Elliott
@@ -21,18 +23,19 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     int fontsize=30;									// FONTS
     Font Enter = new Font("Serif",Font.BOLD,fontsize);
     Font sub = new Font("Serif",Font.BOLD,10);
-    Font title = new Font("Serif",Font.BOLD,19);
-    Font script = new Font("Serif",Font.BOLD,30);
+    Font title = new Font("Monospaced",Font.BOLD,18);
+    Font script = new Font("Dialogue",Font.BOLD,30);
     Font Failed = new Font("Serif",Font.ITALIC,80);
     Font Title = new Font("Serif",Font.BOLD,80);
 
                                                                                                     //Custom Color
     Color Background = new Color(238,	230, 133);
+	Color Background2 = new Color(238,	200, 100);
+	Color Board = new Color(238, 150, 50);
 
     //not Necessary ATM
     Vector ColorVector;
     String yourgrapher;
-
     //Random generation
     Random rand = new Random();
     int xaxislength = 800;//in case you want need to manipulate somethine based on window size
@@ -93,6 +96,23 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 {-40, -24, -4, -3, -3, -4, -24, -40},
 {99, -40, 8, 6, 6, 8, -40, 99},
 }; // for Hard mode
+
+// GRAPHICS 2D
+
+		Point2D center = new Point2D.Float(50, 50);
+		float radius = 25;
+		Point2D focus = new Point2D.Float(40, 40);
+		float[] dist = {0.0f, 0.2f, 1.0f};
+		Color[] wcolors = {Color.WHITE, Color.lightGray, Color.lightGray};
+		RadialGradientPaint pRadialw = new RadialGradientPaint(center, radius, focus, dist, wcolors, CycleMethod.NO_CYCLE);
+		Color[] bcolors = {Color.WHITE, Color.darkGray, Color.BLACK};
+		RadialGradientPaint pRadialb = new RadialGradientPaint(center, radius, focus, dist, bcolors, CycleMethod.NO_CYCLE);
+		Color[] gcolors = {Color.WHITE, Color.lightGray, Color.GREEN};
+		RadialGradientPaint pRadialg = new RadialGradientPaint(center, radius, focus, dist, gcolors, CycleMethod.NO_CYCLE);
+		
+		Color[] backgroundcolors = {Background,Background2};
+			
+
 	/*
 	public Reversi() {
 		//Frame frame = new Frame();
@@ -111,6 +131,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	
     public void init() {
         start();// start any threads or operations(for later if I use them)
+		
     }
 	
 	/*
@@ -178,7 +199,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
             repaint();
     }
 
-    public void update(Graphics g) {//part of paint, allows for smooth transition of frames. No Flashing.
+    public void update(Graphics g) {//part of paint, allows for smooth transition of frames. No Flashing2.
 		Graphics offgc;
 		Image offscreen = null;
 		Dimension d = size();
@@ -197,10 +218,14 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     }
 	
 	public void paint(Graphics g) { // the main function where the magic happens
+		Graphics2D g2 = (Graphics2D)g;
 		if(p==-1) { // start up the Listeners (happens once)
 			addMouseListener(this); 
 			addKeyListener(this); 
 			p=0;
+			String [ ] MyFontNames = Toolkit.getDefaultToolkit( ) . getFontList( );
+			for (int x = 0; x < MyFontNames.length; x++)
+				System.out.println(MyFontNames[x]);
 		}
 		
 		if(p==0) {
@@ -225,7 +250,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 				selectMenu(mX,mY);
 				mouse_clicked=false;
 			}
-			drawMenu(g);
+			drawMenu(g2);
 		}
 		
 		if (p==2) { //game
@@ -250,11 +275,11 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 				mouse_clicked=false;
 			}				// re-evaluate after player moves.
 			
-			drawBoard(g);
-			UndoButton(g,mX,mY);
-			NewGame(g,mX,mY);
+			drawBoard(g2);
+			UndoButton(g2,mX,mY);
+			NewGame(g2,mX,mY);
 			findMoves();
-			drawPieces(g);	
+			drawPieces(g2);	
 			
 			if(!isTurn(turn)&&!gameover()) { // if there is an AI present AI goes.
 				delay(5);
@@ -273,38 +298,38 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 				ResetMoveList();
 			}// re-evaluate after AI moves.
 		
-			drawBoard(g);
-			UndoButton(g,mX,mY);
+			drawBoard(g2);
+			UndoButton(g2,mX,mY);
 			findMoves();
-			drawPieces(g);	
-			NewGame(g,mX,mY);
-			g.setFont(Enter);
-			g.setColor(Color.black);
+			drawPieces(g2);	
+			NewGame(g2,mX,mY);
+			g2.setFont(Enter);
+			g2.setColor(Color.black);
 			if (gameover()) {
 				System.out.println("game over");
-				getWinner(g);
+				getWinner(g2);
 				if (!refreshed) {
 					repaint();
 					refreshed=true;
 				}
 			}
 			if (!gameover()) {
-				g.drawString(turn == white ? "white's turn" : "black's turn",200,550);
+				g2.drawString(turn == white ? "white's turn" : "black's turn",200,550);
 				if(BothAi)
 				repaint();
 			}
 		}
 	}
 	
-	public void NewGame (Graphics g, int x, int y) { // if the main menu is pressed GRAPHICS
+	public void NewGame (Graphics2D g2, int x, int y) { // if the main menu is pressed GRAPHICS
 	
-		g.setColor(Color.darkGray);
-		g.fillRect(548,453,104,44);
-		g.setColor(Color.lightGray);
-		g.fillRect(550,455,100,40);
-		g.setColor(Color.red);
-		g.setFont(script);
-		g.drawString("MENU",555,485);
+		g2.setColor(Color.darkGray);
+		g2.fillRect(548,453,104,44);
+		g2.setColor(Color.lightGray);
+		g2.fillRect(550,455,100,40);
+		g2.setColor(Color.red);
+		g2.setFont(script);
+		g2.drawString("MENU",555,485);
 		if (mouse_clicked&&x<652&&x>548&&y<497&&y>453) {
 			mouse_clicked=false;
 			p=0;
@@ -345,7 +370,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		}
     }
 	
-	public void getWinner (Graphics g) { // who won if there is a game over GRAPHICS INVOLVED
+	public void getWinner (Graphics2D g2) { // who won if there is a game over GRAPHICS INVOLVED
 		int spaces=0;
 		int movepossibilities = 0;
 		int blackpieces = 0;
@@ -362,13 +387,13 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 					movepossibilities++;
 			}
 		System.out.println("blank = " + blank +"black = " + blackpieces +"white = " + whitepieces +"green = " + green);
-		g.setColor(Color.black);
+		g2.setColor(Color.black);
 		if (blackpieces != whitepieces) {
-			g.drawString(blackpieces > whitepieces ? "Black Wins!" : "White Wins!",200,550);
+			g2.drawString(blackpieces > whitepieces ? "Black Wins!" : "White Wins!",200,550);
 			System.out.println(blackpieces > whitepieces ? "Black Wins! win by number" : "White Wins! win by number");
 		}
 		else {
-			g.drawString("TIE!",200,550);
+			g2.drawString("TIE!",200,550);
 			System.out.println("tie game");
 		}
     }
@@ -435,107 +460,122 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		return highestweight;
     }
 	
-	public void drawMenu(Graphics g) { // draw main menu GRAPHICS
-		g.setColor(Background);
-		g.fillRect(0,0,apwidth,apheight);
+	public void drawMenu(Graphics2D g2) { // draw main menu GRAPHICS
+		g2.setColor(Background);
+		g2.fillRect(0,0,apwidth,apheight);
 		
 		//White side
-		g.setColor(Color.lightGray);
-		g.fillRect(25,200,200,50);//human/AI
-		g.fillRect(25,300,225,50);//easy med hard
+		g2.setColor(Color.lightGray);
+		g2.fillRect(25,200,200,50);//human/AI
 		
-		g.setColor(Color.darkGray);
-		g.fillRect(25+100*whiteplayer,200,100,50);//which option for human/ai is selected
-		g.fillRect(25+75*whitedifficulty,300,75,50);// option for difficulty
 		
-		g.setColor(Color.black);
-		g.drawRect(25,200,100,50); //outline for player options
-		g.drawRect(125,200,100,50);
+		g2.setColor(Color.darkGray);
+		g2.fillRect(25+100*whiteplayer,200,100,50);//which option for human/ai is selected
 		
-		g.drawRect(25,300,75,50); // outline for difficulty options
-		g.drawRect(100,300,75,50);
-		g.drawRect(175,300,75,50);
 		
+		g2.setColor(Color.black);
+		g2.drawRect(25,200,100,50); //outline for player options
+		g2.drawRect(125,200,100,50);
+		
+		if(whiteplayer==1)
+		{
+		g2.setColor(Color.lightGray);
+		g2.fillRect(25,300,225,50);//easy med hard
+		g2.setColor(Color.darkGray);
+		g2.fillRect(25+75*whitedifficulty,300,75,50);// option for difficulty
+		g2.setColor(Color.black);
+		g2.drawRect(25,300,75,50); // outline for difficulty options
+		g2.drawRect(100,300,75,50);
+		g2.drawRect(175,300,75,50);
+		}
 		//Black side
-		g.setColor(Color.lightGray);
-		g.fillRect(400,200,200,50);
-		g.fillRect(400,300,225,50);
+		g2.setColor(Color.lightGray);
+		g2.fillRect(400,200,200,50);
 		
-		g.setColor(Color.darkGray);
-		g.fillRect(400+100*blackplayer,200,100,50);
-		g.fillRect(400+75*blackdifficulty,300,75,50);
-		g.setColor(Color.black);
-		g.drawRect(400,200,100,50);
-		g.drawRect(500,200,100,50);
-		
-		g.drawRect(400,300,75,50);
-		g.drawRect(475,300,75,50);
-		g.drawRect(550,300,75,50);
-		
+		g2.setColor(Color.darkGray);
+		g2.fillRect(400+100*blackplayer,200,100,50);
+		g2.setColor(Color.black);
+		g2.drawRect(400,200,100,50);
+		g2.drawRect(500,200,100,50);
+		if(blackplayer==1)
+		{
+		g2.setColor(Color.lightGray);
+		g2.fillRect(400,300,225,50);
+		g2.setColor(Color.darkGray);
+		g2.fillRect(400+75*blackdifficulty,300,75,50);
+		g2.setColor(Color.black);
+		g2.drawRect(400,300,75,50);
+		g2.drawRect(475,300,75,50);
+		g2.drawRect(550,300,75,50);
+		}
 		//Play Button
-		g.setColor(Color.lightGray);
-		g.fillRect(175,450,300,100);
-		g.setColor(Color.black);
-		g.drawRect(175,450,300,100);
+		g2.setColor(Color.lightGray);
+		g2.fillRect(175,450,300,100);
+		g2.setColor(Color.black);
+		g2.drawRect(175,450,300,100);
 		
-		//Host Button
-		g.setColor(Color.lightGray);
-		g.fillRect(560,375,75,30);
-		g.setColor(Color.black);
-		g.drawRect(560,375,75,30);
+		/*//Host Button
+		g2.setColor(Color.lightGray);
+		g2.fillRect(560,375,75,30);
+		g2.setColor(Color.black);
+		g2.drawRect(560,375,75,30);
 		
-		g.setColor(Color.lightGray);
-		g.fillRect(498,408,204,34);
+		g2.setColor(Color.lightGray);
+		g2.fillRect(498,408,204,34);
 		if(HostId.length()>0)
-			g.setColor(Color.black);
+			g2.setColor(Color.black);
 		else
-			g.setColor(Color.darkGray);
-			g.fillRect(500,410,200,30);
+			g2.setColor(Color.darkGray);
+			g2.fillRect(500,410,200,30);
 		
 		
 		//Connect Button
-		g.setColor(Color.lightGray);
-		g.fillRect(560,475,75,30);
-		g.setColor(Color.black);
-		g.drawRect(560,475,75,30);
+		g2.setColor(Color.lightGray);
+		g2.fillRect(560,475,75,30);
+		g2.setColor(Color.black);
+		g2.drawRect(560,475,75,30);
 		
-		g.setColor(Color.lightGray);
-		g.fillRect(498,508,204,34);
+		g2.setColor(Color.lightGray);
+		g2.fillRect(498,508,204,34);
 		if(typingClient)
-			g.setColor(Color.black);
+			g2.setColor(Color.black);
 		else
-			g.setColor(Color.darkGray);
-			g.fillRect(500,510,200,30);
+			g2.setColor(Color.darkGray);
+			g2.fillRect(500,510,200,30);*/
 		
-		g.setColor(Color.black); // All the words.
-		g.setFont(script);
-		g.drawString("MAIN MENU",220,100);
-		g.drawString("WHITE",30,170);
-		g.drawString("BLACK",420,170);
-		g.drawString("VS.",320,300);
-		g.drawString("PLAY",280,510);
-		g.setFont(title);
-		g.drawString("Human",30,240);
-		g.drawString("AI",130,240);
-		g.drawString("Human",410,240);
-		g.drawString("AI",510,240);
+		g2.setColor(Color.black); // All the words.
+		g2.setFont(script);
+		g2.drawString("MAIN MENU",220,100);
+		g2.drawString("WHITE",30,170);
+		g2.drawString("BLACK",420,170);
+		g2.drawString("VS.",300,300);
+		g2.drawString("PLAY",280,510);
+		g2.setFont(title);
+		g2.drawString("Human",30,240);
+		g2.drawString("AI",130,240);
+		g2.drawString("Human",410,240);
+		g2.drawString("AI",510,240);
+		if(whiteplayer==1)
+		{
+		g2.drawString("Easy",30,340);
+		g2.drawString("Medium",105,340);
+		g2.drawString("Hard",180,340);
+		}
+		if(blackplayer==1)
+		{
+		g2.drawString("Easy",405,340);
+		g2.drawString("Medium",480,340);
+		g2.drawString("Hard",555,340);
+		}
+		/*g2.setFont(title);
+		g2.drawString("Host",580,400);
+		g2.drawString("Connect",562,500);*/
 		
-		g.drawString("Easy",30,340);
-		g.drawString("Medium",105,340);
-		g.drawString("Hard",180,340);
-		g.drawString("Easy",405,340);
-		g.drawString("Medium",480,340);
-		g.drawString("Hard",555,340);
-		
-		g.setFont(title);
-		g.drawString("Host",580,400);
-		g.drawString("Connect",562,500);
-		
-		g.setColor(Color.white);
+		g2.setColor(Color.white);
 		if(hostconnected)
-			g.drawString(PortId,505,435);
+			g2.drawString(PortId,505,435);
 		if(clientconnected)
-			g.drawString(PortId,505,535);
+			g2.drawString(PortId,505,535);
     }
 	
 	public void selectMenu(int x, int y) { // how the mouse selects the main menu (GRAPHICS)
@@ -596,26 +636,33 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		}
     }
 	
-	public void drawBoard(Graphics g) { // draw the game board (GRAPHICS)
-		g.setColor(Background);
-		g.fillRect(0,0,apwidth,apheight);
-		g.setColor(Color.black);
-		g.drawRect(boardoffset,boardoffset,400,400);
+	public void drawBoard(Graphics2D g2) { // draw the game board (GRAPHICS)
+		
+		
+		GradientPaint gp = new GradientPaint(75, 75, Background, 295, 295, Background2, true); //http://oreilly.com/catalog/java2d/chapter/ch04.html
+		// Fill with a gradient.
+		g2.setPaint(gp);
+		//g2.fill(e);
+		g2.fillRect(0,0,apwidth,apheight);
+		g2.setColor(Board);
+		g2.fill3DRect(boardoffset-10, boardoffset-10, 420, 420, true);
+		g2.setColor(Color.black);
+		g2.drawRect(boardoffset,boardoffset,400,400);
 		for(int i=boardoffset; i<500; i+=50) {
-			g.drawLine(i,boardoffset,i,boardoffset + 400);
-			g.drawLine(boardoffset,i,boardoffset + 400,i);
+			g2.drawLine(i,boardoffset,i,boardoffset + 400);
+			g2.drawLine(boardoffset,i,boardoffset + 400,i);
 		}
     }
 	
-	public void UndoButton(Graphics g,int x,int y) { // undo (GRAPHICS)
+	public void UndoButton(Graphics2D g2,int x,int y) { // undo (GRAPHICS)
 		int iterator=1;
-		g.setColor(Color.darkGray);
-		g.fillRect(548,353,104,44);
-		g.setColor(Color.lightGray);
-		g.fillRect(550,355,100,40);
-		g.setColor(Color.red);
-		g.setFont(script);
-		g.drawString("UNDO",555,385);
+		g2.setColor(Color.darkGray);
+		g2.fillRect(548,353,104,44);
+		g2.setColor(Color.lightGray);
+		g2.fillRect(550,355,100,40);
+		g2.setColor(Color.red);
+		g2.setFont(script);
+		g2.drawString("UNDO",555,385);
 		
 		if (mouse_clicked&&x<652&&x>548&&y<397&&y>353) {
 			mouse_clicked=false;
@@ -650,20 +697,38 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 						}
 				ResetMoveList();
 	}
-	public void drawPieces(Graphics g) { // draw all the pieces on the board (GRAPHICS)
+	public void drawPieces(Graphics2D g2) { // draw all the pieces on the board (GRAPHICS)
 		for (int i=0; i<8; i++)
 			for (int j=0; j<8; j++) {
 				if(board[i][j]==white) {
-					g.setColor(Color.white);
-					g.fillOval(boardoffset + 50*i,boardoffset + 50*j,50,50);
+					Point2D center = new Point2D.Float(boardoffset +25+ 50*i,boardoffset +25+50*j); //http://oreilly.com/catalog/java2d/chapter/ch04.html
+					float radius = 25;
+					focus = new Point2D.Float(boardoffset +15+ 50*i,boardoffset +15+50*j);
+					float[] dist = {0.0f, 0.9f, 1.0f};
+					RadialGradientPaint pRadialw = new RadialGradientPaint(center, radius, focus, dist, wcolors, CycleMethod.NO_CYCLE);
+					Ellipse2D e = new Ellipse2D.Double(boardoffset + 50*i,boardoffset + 50*j,50,50);
+					g2.setPaint(pRadialw);
+					g2.fill(e);
 				}
 				else if(board[i][j]==black) {
-					g.setColor(Color.black);
-					g.fillOval(boardoffset + 50*i,boardoffset + 50*j,50,50);
+					Point2D center = new Point2D.Float(boardoffset +25+ 50*i,boardoffset +25+50*j);
+					float radius = 25;
+					focus = new Point2D.Float(boardoffset +15+ 50*i,boardoffset +15+50*j);
+					float[] dist = {0.0f, 0.1f, 1.0f};
+					RadialGradientPaint pRadialb = new RadialGradientPaint(center, radius, focus, dist, bcolors, CycleMethod.NO_CYCLE);
+					Ellipse2D e = new Ellipse2D.Double(boardoffset + 50*i,boardoffset + 50*j,50,50);
+					g2.setPaint(pRadialb);
+					g2.fill(e);
 				}
 				else if(board[i][j]==green) {
-					g.setColor(Color.green);
-					g.fillOval(boardoffset+ 15 + 50*i,boardoffset+ 15 + 50*j,20,20);
+					Point2D center = new Point2D.Float(boardoffset +25+ 50*i,boardoffset +25+50*j);
+					float radius = 10;
+					focus = new Point2D.Float(boardoffset+ 20 + 50*i,boardoffset+ 20 + 50*j);
+					float[] dist = {0.0f, 0.2f, 1.0f};
+					RadialGradientPaint pRadialg = new RadialGradientPaint(center, radius, focus, dist, gcolors, CycleMethod.NO_CYCLE);
+					Ellipse2D e = new Ellipse2D.Double(boardoffset+ 15 + 50*i,boardoffset+ 15 + 50*j,20,20);
+					g2.setPaint(pRadialg);
+					g2.fill(e);
 				}
 			}
     }
