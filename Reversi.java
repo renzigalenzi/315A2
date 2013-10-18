@@ -43,7 +43,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     int clicks = 0;
     boolean AiPresent=false; // self explanitory booleans
     boolean BothAi = false;
-    boolean nomoves = false;
+    int nomoves = 0;
     boolean refreshed =false; // for repaint, if not repainted yet, refresh and repaint
 	boolean hostconnected = false;
 	boolean clientconnected = false;
@@ -318,6 +318,12 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 				if(BothAi)
 				repaint();
 			}
+			if(nomoves == turn)
+			{
+			otherturn = otherturn == white ? black : white;
+			turn = turn == white ? black : white;
+			repaint();
+			}
 		}
 	}
 	
@@ -355,17 +361,17 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		if (spaces == 0 && movepossibilities == 0)
 			return true;
 			
-		else if (movepossibilities == 0&&nomoves) {
+		else if (movepossibilities == 0&&nomoves==otherturn) {
 			return true;
 		}
 		
 		else if (movepossibilities == 0) {
-			nomoves=true;
+			nomoves=turn;
 			return false;
 		}
 		
 		else {
-			nomoves=false;
+			nomoves=0;
 			return false;
 		}
     }
@@ -452,7 +458,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 					}	
 				}
 			}
-		System.out.println(turn == black ? "highest weight for black was "+highestweight+" from "+ivalue+" "+jvalue : "highest weight for white was "+highestweight+" from "+ivalue+" "+jvalue);
+		//System.out.println(turn == black ? "highest weight for black was "+highestweight+" from "+ivalue+" "+jvalue : "highest weight for white was "+highestweight+" from "+ivalue+" "+jvalue);
 		if (ivalue>=0&&jvalue>=0) {
 			board[ivalue][jvalue]=turn;
 			ChangePieces(ivalue,jvalue);
@@ -668,7 +674,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			mouse_clicked=false;
 			if(AiPresent==true) {
 				iterator=2;
-				System.out.println("doubles");
+				//System.out.println("doubles");
 			}
 			for(int it=0;it<iterator;it++) {
 				UndoMove();
