@@ -72,13 +72,11 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     final int easy = 0;
     final int medium = 1;
     final int hard = 2;
-	ReversiServer reversiServer;
-    ReversiClient reversiClient;
 	int forwardturns = 0;
     int board[][] = new int[8][8];
     int weight[][] = new int[8][8];//weight value gets calculated for each position
     int undoboards[][][] = new int[10][8][8];
-
+	//
     int wordloc=30; //shifting any words
 	int turnchecker = 0;
     int turn = black;
@@ -87,15 +85,15 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     int mY = 0;
     int[][] weights = new int[][]
 		{
-{99, -40, 8, 6, 6, 8, -40, 99},
-{-40, -24, -4, -3, -3, -4, -24, -40},
-{8, -4, 7, 4, 4, 7, -4, 8},
-{6, -3, 4, 0, 0, 4, -3, 6},
-{6, -3, 4, 0, 0, 4, -3, 6},
-{8, -4, 7, 4, 4, 7, -4, 8},
-{-40, -24, -4, -3, -3, -4, -24, -40},
-{99, -40, 8, 6, 6, 8, -40, 99},
-}; // for Hard mode
+		{99, -40, 8, 6, 6, 8, -40, 99},
+		{-40, -24, -4, -3, -3, -4, -24, -40},
+		{8, -4, 7, 4, 4, 7, -4, 8},
+		{6, -3, 4, 0, 0, 4, -3, 6},
+		{6, -3, 4, 0, 0, 4, -3, 6},
+		{8, -4, 7, 4, 4, 7, -4, 8},
+		{-40, -24, -4, -3, -3, -4, -24, -40},
+		{99, -40, 8, 6, 6, 8, -40, 99},
+		}; // for Hard mode
 
 // GRAPHICS 2D
 
@@ -112,7 +110,76 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		Color[] backgroundcolors = {Background,Background2};
 			
-
+	//networking
+	private static ServerSocket serversocket;
+	private static Socket clientsocket;
+	private static PrintWriter netOut;
+	private static BufferedReader netIn;
+	public static String hostname;
+	public static String portnumber;
+	
+	//this xor client will be called in an instance
+	//these pass arguments, but as the main (as it is) sets the global values as well
+	public static void connectAsServer(String host, String port) throws IOException, UnknownHostException {
+		hostname = host;
+		portnumber = port;
+		
+		int portint = Integer.parseInt(portnumber);
+		InetAddress addr = InetAddress.getByName(hostname);
+		//server socket
+		try {
+			serversocket = new ServerSocket(portint, 1, addr);
+            hostname = serversocket.getInetAddress().getHostName(); //possibly unnecessary, but safe I suppose
+            System.out.println("Hostname: " + hostname);
+            System.out.println("Port: " + portnumber);
+            if (serversocket.isBound())
+                System.out.println("Socket serversocket is bound"); //just for testing
+		} catch (IOException e) {
+			System.err.println("Couldn't listen on port " + portnumber);
+            System.exit(1);
+		}
+		//client socket
+		try {
+            clientsocket = serversocket.accept();
+            System.out.println("Connected to client");
+        } catch (IOException e) {
+            System.err.println("Couldn't accept connection");
+            System.exit(1);
+        }
+		//in and out
+		netOut = new PrintWriter(clientsocket.getOutputStream(), true);
+        netIn = new BufferedReader(new InputStreamReader(clientsocket.getInputStream()));
+	}
+	
+	//this xor server will be called in an instance
+	//these pass arguments, but as the main (as it is) sets the global values as well
+	public static void connectAsClient(String host, String port) throws IOException, UnknownHostException {
+		hostname = host;
+		portnumber = port;
+		
+		int portint = Integer.parseInt(portnumber);
+		//conect client's socket
+		try {
+			clientsocket = new Socket(hostname, portint);
+			if (clientsocket.isBound())
+                System.out.println("Socket clientsocket is bound to " + hostname + " and port " + port);
+			else System.out.println("clientsocket not bound?...");
+			//in and out
+			netOut = new PrintWriter(clientsocket.getOutputStream(), true);
+            netIn = new BufferedReader(new InputStreamReader(clientsocket.getInputStream()));
+		} catch (UnknownHostException e) {
+			System.err.println("Client could not find that host...");
+            System.exit(1);
+		} catch (IOException e) {
+			System.err.println("IO connection failed clientside");
+            System.exit(1);
+		}
+	}
+	
+	public void processInput(String input) {
+		//look at input and do stuff
+	}
+	
 	/*
 	public Reversi() {
 		//Frame frame = new Frame();
@@ -134,9 +201,33 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
     }
 	
-	/*
+	
     public static void main(String arg[])throws Exception {
-        //main menu sets up the frame for the application
+        //ask to start server or client
+		Object[] options = { "Server", "Client" };
+		Object startAs = JOptionPane.showInputDialog(null, "Choose one", "Input", 
+				JOptionPane.INFORMATION_MESSAGE, null, 
+				options, options[0]);
+				
+		//if startAs is "Server", connect as server
+		//else if startAs is "Client", connect as client
+		//else something f'ed up
+		
+		if (startAs.equals("Server")) {
+			//get host and port GUI
+			hostname = JOptionPane.showInputDialog(null, "Enter hostname", 1);
+			portnumber = JOptionPane.showInputDialog(null, "Enter the port number", 1);
+			//
+			connectAsServer(hostname, portnumber);
+		}
+		else if (startAs.equals("Client")) {
+			hostname = JOptionPane.showInputDialog(null, "Enter hostname", 1);
+			portnumber = JOptionPane.showInputDialog(null, "Enter the port number", 1);
+			//
+			connectAsClient(hostname, portnumber);
+		}
+		else System.out.println("Something f'ed up, it's pretty impossible to get here");
+		//main menu sets up the frame for the application
 
         //Frame frame = new Frame();
         Frame frame = new Frame();
@@ -153,18 +244,22 @@ public class Reversi extends Applet implements MouseListener, KeyListener
         frame.show();
         
         // temp values for testing
-        //HostId = "quizzical";
-        //ClientId = "quizzical";
         PortId = "4444";
 		
         // have an if statement to choose which to start based on if Host or
         // Connect button is pressed, perhaps set a global bool?
-        ReversiServer reversiServer = new ReversiServer(PortId);
+        //ReversiServer reversiServer = new ReversiServer(PortId);
         System.out.println("is it not getting here?");
-        HostId = reversiServer.hostname;
-        ReversiClient reversiClient = new ReversiClient(HostId, PortId);
+        //HostId = reversiServer.hostname;
+        //ReversiClient reversiClient = new ReversiClient(HostId, PortId);
+		
+		//close stuff when we're done
+		netOut.close();
+        netIn.close();
+        clientsocket.close();
+        serversocket.close();
     }
-	*/
+	
 	
     public void keyPressed(KeyEvent evt) //key events
     {    }
