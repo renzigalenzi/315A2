@@ -178,23 +178,92 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	
 	public void processInput(String input) {
 		//look at input and do stuff
+		String[] rows = { "a", "b", "c", "d", "e", "f", "g", "h" };
+		String[] columns = { "1", "2", "3", "4", "5", "6", "7", "8" };
+		
+		String delimit = "[ ]+"; //multiple spaces will still work
+		String[] tokens = input.split(delimit);
+		System.out.println("tokens[0] = " + tokens[0]);
+		//convert all tokens to lowercase, to be case insensitive
+		for (String t : tokens) {
+			t = t.toLowerCase();
+			System.out.println("t = ");
+			System.out.println("|" + t + "|");
+		}
+		//parse stuff-----------------------------
+		if (tokens[0].equals("exit")) {
+			//exit
+			System.out.println("Exit now");
+		}
+		else if (tokens[0].equals("display")) {
+			//toggle display, whatever that means
+			System.out.println("toggle display");
+		}
+		//----------------------------------------
+		else if (tokens[0].equals("undo")) {
+			System.out.println("Undo command");
+			UndoMove();
+		}
+		// else if (tokens[0] == "redo") {
+			
+		// }
+		//----------------------------------------
+		else if (tokens[0].equals(";")) {
+			//comment is rest of elements, print to console
+			for (String i : tokens)
+				System.out.println(i);
+		}
+		//----------------------------------------
+		else if (tokens[0].equals("human-ai")) {
+		System.out.println("human-ai command");
+			//check difficulty
+			if (tokens[1].equals("easy"))
+				blackdifficulty = 0;
+			else if (tokens[1].equals("medium"))
+				blackdifficulty = 1;
+			else if (tokens[1].equals("hard"))
+				blackdifficulty = 2;
+		}
+		else if (tokens[0].equals("ai-ai")) {
+			System.out.println("ai-ai command");
+			//check and set both difficulty settings
+			//instructions say to put port and hostname here, but we're doing that in the setup, so screw it
+			if (tokens[1].equals("easy"))
+				whitedifficulty = 0;
+			else if (tokens[1].equals("medium"))
+				whitedifficulty = 1;
+			else if (tokens[1].equals("hard"))
+				whitedifficulty = 2;
+			//second difficulty
+			if (tokens[2].equals("easy"))
+				blackdifficulty = 0;
+			else if (tokens[2].equals("medium"))
+				blackdifficulty = 1;
+			else if (tokens[2].equals("hard"))
+				blackdifficulty = 2;
+		}
+		//----------------------------------------
+		else if (isMoveString(tokens[0])) {
+			System.out.println("move command");
+			//do move tokens[0]
+		}
+		else System.out.println("Really, didn't hit any of these?");
 	}
 	
-	/*
-	public Reversi() {
-		//Frame frame = new Frame();
-        Frame frame = new Frame();
-        Applet applet = new Reversi();
-        frame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }	
-        });
-
-        frame.add(applet);
-        frame.setSize(apwidth,apheight);
-        frame.show();
-	}*/
+	// checks if the string is a move
+	public boolean isMoveString(String input) {
+		String[] rows = { "a", "b", "c", "d", "e", "f", "g", "h" };
+		String[] columns = { "1", "2", "3", "4", "5", "6", "7", "8" };
+		
+		for (String r : rows) { 
+			if (input.startsWith(r)) // check first character
+				for (String c : columns) {
+					if (input.startsWith(r, 1)) //check second character
+						return true;		
+				}						
+		}
+		return false;		
+	}
 	
     public void init() {
         start();// start any threads or operations(for later if I use them)
@@ -208,21 +277,17 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		Object startAs = JOptionPane.showInputDialog(null, "Choose one", "Input", 
 				JOptionPane.INFORMATION_MESSAGE, null, 
 				options, options[0]);
-				
-		//if startAs is "Server", connect as server
-		//else if startAs is "Client", connect as client
-		//else something f'ed up
 		
 		if (startAs.equals("Server")) {
 			//get host and port GUI
-			hostname = JOptionPane.showInputDialog(null, "Enter hostname", 1);
-			portnumber = JOptionPane.showInputDialog(null, "Enter the port number", 1);
+			hostname = JOptionPane.showInputDialog(null, "Enter hostname", "localhost");
+			portnumber = JOptionPane.showInputDialog(null, "Enter the port number", "4444");
 			//
 			connectAsServer(hostname, portnumber);
 		}
 		else if (startAs.equals("Client")) {
-			hostname = JOptionPane.showInputDialog(null, "Enter hostname", 1);
-			portnumber = JOptionPane.showInputDialog(null, "Enter the port number", 1);
+			hostname = JOptionPane.showInputDialog(null, "Enter hostname", "localhost");
+			portnumber = JOptionPane.showInputDialog(null, "Enter the port number", "4444");
 			//
 			connectAsClient(hostname, portnumber);
 		}
@@ -313,6 +378,8 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     }
 	
 	public void paint(Graphics g) { // the main function where the magic happens
+		processInput("AI-AI EASY");
+		System.out.println("i called processInput...");
 		Graphics2D g2 = (Graphics2D)g;
 		if(p==-1) { // start up the Listeners (happens once)
 			addMouseListener(this); 
@@ -776,27 +843,26 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			}
 		}
     }
-	public void UndoMove()
-	{
-	boolean difference = false;
-				System.out.println("undo");
-				ResetMoveList();
+	public void UndoMove() {
+		boolean difference = false;
+			System.out.println("undo");
+			ResetMoveList();
+			for(int j=0;j<8;j++)
+				for(int k=0;k<8;k++) {
+					if (board[j][k]!=undoboards[0][j][k])
+						difference=true;
+					board[j][k]=undoboards[0][j][k];
+				}
+			if (difference) {
+				otherturn = otherturn == white ? black : white;
+				turn = turn == white ? black : white;
+			}
+			for(int i=0;i<9;i++)
 				for(int j=0;j<8;j++)
 					for(int k=0;k<8;k++) {
-						if (board[j][k]!=undoboards[0][j][k])
-							difference=true;
-						board[j][k]=undoboards[0][j][k];
+						undoboards[i][j][k]=undoboards[i+1][j][k];
 					}
-				if (difference) {
-					otherturn = otherturn == white ? black : white;
-					turn = turn == white ? black : white;
-				}
-				for(int i=0;i<9;i++)
-					for(int j=0;j<8;j++)
-						for(int k=0;k<8;k++) {
-							undoboards[i][j][k]=undoboards[i+1][j][k];
-						}
-				ResetMoveList();
+			ResetMoveList();
 	}
 	public void drawPieces(Graphics2D g2) { // draw all the pieces on the board (GRAPHICS)
 		for (int i=0; i<8; i++)
