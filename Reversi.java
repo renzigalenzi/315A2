@@ -183,24 +183,30 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		String delimit = "[ ]+"; //multiple spaces will still work
 		String[] tokens = input.split(delimit);
-		System.out.println("tokens[0] = " + tokens[0]);
+		//String[] tokens = { "exit" }; //this works
+		
 		//convert all tokens to lowercase, to be case insensitive
+		//This doesn't save them as lowercase...
 		for (String t : tokens) {
 			t = t.toLowerCase();
+			t.trim();
 			System.out.println("t = ");
 			System.out.println("|" + t + "|");
 		}
+		
+		System.out.println("tokens[0] = " + tokens[0]);
+		
 		//parse stuff-----------------------------
-		if (tokens[0].equals("exit")) {
+		if (tokens[0].equalsIgnoreCase("exit")) {
 			//exit
 			System.out.println("Exit now");
 		}
-		else if (tokens[0].equals("display")) {
+		else if (tokens[0].equalsIgnoreCase("display")) {
 			//toggle display, whatever that means
 			System.out.println("toggle display");
 		}
 		//----------------------------------------
-		else if (tokens[0].equals("undo")) {
+		else if (tokens[0].equalsIgnoreCase("undo")) {
 			System.out.println("Undo command");
 			UndoMove();
 		}
@@ -208,38 +214,38 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			
 		// }
 		//----------------------------------------
-		else if (tokens[0].equals(";")) {
+		else if (tokens[0].equalsIgnoreCase(";")) { //This works!
 			//comment is rest of elements, print to console
 			for (String i : tokens)
 				System.out.println(i);
 		}
 		//----------------------------------------
-		else if (tokens[0].equals("human-ai")) {
+		else if (tokens[0].equalsIgnoreCase("human-ai")) {
 		System.out.println("human-ai command");
 			//check difficulty
-			if (tokens[1].equals("easy"))
+			if (tokens[1].equalsIgnoreCase("easy"))
 				blackdifficulty = 0;
-			else if (tokens[1].equals("medium"))
+			else if (tokens[1].equalsIgnoreCase("medium"))
 				blackdifficulty = 1;
-			else if (tokens[1].equals("hard"))
+			else if (tokens[1].equalsIgnoreCase("hard"))
 				blackdifficulty = 2;
 		}
-		else if (tokens[0].equals("ai-ai")) {
+		else if (tokens[0].trim().equalsIgnoreCase("ai-ai")) {
 			System.out.println("ai-ai command");
 			//check and set both difficulty settings
 			//instructions say to put port and hostname here, but we're doing that in the setup, so screw it
-			if (tokens[1].equals("easy"))
+			if (tokens[1].equalsIgnoreCase("easy"))
 				whitedifficulty = 0;
-			else if (tokens[1].equals("medium"))
+			else if (tokens[1].equalsIgnoreCase("medium"))
 				whitedifficulty = 1;
-			else if (tokens[1].equals("hard"))
+			else if (tokens[1].equalsIgnoreCase("hard"))
 				whitedifficulty = 2;
 			//second difficulty
-			if (tokens[2].equals("easy"))
+			if (tokens[2].equalsIgnoreCase("easy"))
 				blackdifficulty = 0;
-			else if (tokens[2].equals("medium"))
+			else if (tokens[2].equalsIgnoreCase("medium"))
 				blackdifficulty = 1;
-			else if (tokens[2].equals("hard"))
+			else if (tokens[2].equalsIgnoreCase("hard"))
 				blackdifficulty = 2;
 		}
 		//----------------------------------------
@@ -252,13 +258,13 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	
 	// checks if the string is a move
 	public boolean isMoveString(String input) {
-		String[] rows = { "a", "b", "c", "d", "e", "f", "g", "h" };
-		String[] columns = { "1", "2", "3", "4", "5", "6", "7", "8" };
+		char[] rows = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+		char[] columns = { '1', '2', '3', '4', '5', '6', '7', '8' };
 		
-		for (String r : rows) { 
-			if (input.startsWith(r)) // check first character
-				for (String c : columns) {
-					if (input.startsWith(r, 1)) //check second character
+		for (char r : rows) { 
+			if (input.charAt(0) == r) // check first character
+				for (char c : columns) {
+					if (input.charAt(1) == c) //check second character
 						return true;		
 				}						
 		}
@@ -378,8 +384,13 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     }
 	
 	public void paint(Graphics g) { // the main function where the magic happens
-		processInput("AI-AI EASY");
-		System.out.println("i called processInput...");
+		processInput("EXIT");
+		processInput("UNDO");
+		processInput("AI-AI EASY EASY");
+		processInput("HUMAN-AI MEDIUM");
+		processInput("a3");
+		processInput("DISPLAY");
+		
 		Graphics2D g2 = (Graphics2D)g;
 		if(p==-1) { // start up the Listeners (happens once)
 			addMouseListener(this); 
