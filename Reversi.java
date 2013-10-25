@@ -210,11 +210,11 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			System.out.println("Undo command");
 			UndoMove();
 		}
-		// else if (tokens[0] == "redo") {
+		// else if (tokens[0].equalsIgnoreCase("redo")) {
 			
 		// }
 		//----------------------------------------
-		else if (tokens[0].equalsIgnoreCase(";")) {
+		else if (tokens[0].equalsIgnoreCase(";")) { //This works!
 			//comment is rest of elements, print to console
 			for (String i : tokens)
 				System.out.println(i);
@@ -384,13 +384,14 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     }
 	
 	public void paint(Graphics g) { // the main function where the magic happens
+		//testing parsing------------------------
 		processInput("EXIT");
 		processInput("UNDO");
 		processInput("AI-AI EASY EASY");
 		processInput("HUMAN-AI MEDIUM");
 		processInput("a3");
 		processInput("DISPLAY");
-		
+		//---------------------------------------
 		Graphics2D g2 = (Graphics2D)g;
 		if(p==-1) { // start up the Listeners (happens once)
 			addMouseListener(this); 
