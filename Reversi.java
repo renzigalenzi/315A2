@@ -66,6 +66,10 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     int blackplayer=0;
     final int human = 0;
     final int Ai = 1;
+	static int ServerID = 1;
+	static int ClientID = 2;
+	static int TypeClient = 0;
+	
     //difficulties
     int blackdifficulty = 0;
     int whitedifficulty = 0;
@@ -123,7 +127,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	public static void connectAsServer(String host, String port) throws IOException, UnknownHostException {
 		hostname = host;
 		portnumber = port;
-		
+		TypeClient = ServerID;
 		int portint = Integer.parseInt(portnumber);
 		InetAddress addr = InetAddress.getByName(hostname);
 		//server socket
@@ -142,21 +146,32 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		try {
             clientsocket = serversocket.accept();
             System.out.println("Connected to client");
-        } catch (IOException e) {
+			netOut = new PrintWriter(clientsocket.getOutputStream(), true);
+			netIn = new BufferedReader(new InputStreamReader(clientsocket.getInputStream()));
+		
+		} catch (IOException e) {
             System.err.println("Couldn't accept connection");
             System.exit(1);
         }
+		String inputLine, outputLine;
+		outputLine = "hello";
+		//while ((inputLine = netIn.readLine()) != null)
+		//{
+		netOut.println(outputLine);
+		//}
 		//in and out
-		netOut = new PrintWriter(clientsocket.getOutputStream(), true);
-        netIn = new BufferedReader(new InputStreamReader(clientsocket.getInputStream()));
+		
 	}
-	
+	public int getCientType()
+	{
+	return TypeClient;
+	}
 	//this xor server will be called in an instance
 	//these pass arguments, but as the main (as it is) sets the global values as well
 	public static void connectAsClient(String host, String port) throws IOException, UnknownHostException {
 		hostname = host;
 		portnumber = port;
-		
+		TypeClient = ClientID;
 		int portint = Integer.parseInt(portnumber);
 		//conect client's socket
 		try {
@@ -173,6 +188,15 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		} catch (IOException e) {
 			System.err.println("IO connection failed clientside");
             System.exit(1);
+		}
+		String inputLine, outputLine;
+		while ((inputLine = netIn.readLine()) != null)
+		{
+		if ( inputLine.equals("hello"))
+		{
+		System.out.println("I got a hello!");
+		netOut.println("hello to you too");
+		}
 		}
 	}
 	
@@ -259,7 +283,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	// checks if the string is a move
 	public boolean isMoveString(String input) {
 		char[] rows = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
-		char[] columns = { '1', '2', '3', '4', '5', '6', '7', '8' };
+		char[] columns = { '0', '1', '2', '3', '4', '5', '6', '7'};
 		
 		for (char r : rows) { 
 			if (input.charAt(0) == r) // check first character
@@ -279,6 +303,8 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	
     public static void main(String arg[])throws Exception {
         //ask to start server or client
+		
+		
 		Object[] options = { "Server", "Client" };
 		Object startAs = JOptionPane.showInputDialog(null, "Choose one", "Input", 
 				JOptionPane.INFORMATION_MESSAGE, null, 
@@ -299,7 +325,6 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		}
 		else System.out.println("Something f'ed up, it's pretty impossible to get here");
 		//main menu sets up the frame for the application
-
         //Frame frame = new Frame();
         Frame frame = new Frame();
         Applet applet = new Reversi();
@@ -308,7 +333,14 @@ public class Reversi extends Applet implements MouseListener, KeyListener
                 System.exit(0);
             }	
         });
-
+		
+		
+		JFrame menu = new JFrame("Menu");
+		JButton but = new JButton("Test");
+		menu.add(but);
+		menu.show();
+		
+		
         frame.add(applet);
         frame.setSize(apwidth,apheight);
 
@@ -385,12 +417,24 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	
 	public void paint(Graphics g) { // the main function where the magic happens
 		//testing parsing------------------------
-		processInput("EXIT");
+		/*processInput("EXIT");
 		processInput("UNDO");
 		processInput("AI-AI EASY EASY");
 		processInput("HUMAN-AI MEDIUM");
 		processInput("a3");
-		processInput("DISPLAY");
+		processInput("DISPLAY");*/
+		int n = getCientType();
+		System.out.println(n);
+		
+		try
+		{
+		if ( netIn.ready())
+		System.out.println("netIn is ready");
+		String inputhere;
+		inputhere = netIn.readLine();
+		System.out.println(inputhere);
+		}
+		catch(IOException e){System.out.println("didn't work, who'd a thunk");}
 		//---------------------------------------
 		Graphics2D g2 = (Graphics2D)g;
 		if(p==-1) { // start up the Listeners (happens once)
@@ -602,9 +646,19 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		x=(x-boardoffset)/50;
 		y=(y-boardoffset)/50;
 		board[x][y]=turn;
+		String a=Alpha (x);
+		a += Integer.toString( y );
+		netOut.println(a);
+		System.out.println(a);
+		//send the move only if (TypeClient == turn)
 		System.out.println("ok");
 		ChangePieces(x,y);
     }
+	public String Alpha( int x )
+	{
+	String[] letters = { "a", "b", "c", "d", "e", "f", "g", "h" };
+	return letters[x];
+	}
 	
 	public int AiPlay() { // the AI moves, calculates the move with the greatest value, then plays there. Board state is then changed.
 		int highestweight = -100;
@@ -1401,4 +1455,18 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 			endDelay = System.currentTimeMillis();	
 	}
 }	
+class SimpleThread extends Thread {
+    public SimpleThread(String str) {
+	super(str);
+    }
+    public void run() {
+	for (int i = 0; i < 10; i++) {
+	    System.out.println(i + " " + getName());
+            try {
+		sleep((int)(Math.random() * 1000));
+	    } catch (InterruptedException e) {}
+	}
+	System.out.println("DONE! " + getName());
+    }
+}
 

@@ -248,10 +248,10 @@ public class ReversiGUI extends JFrame{
     //Running Main program
     public static void main(String[] args) {
         //Makes the program look better - take out if giving error compiling on local and on server
-        try {
+        /*try {
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
         } catch (UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException | ClassNotFoundException ex) {
-        }
+        }*/
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
