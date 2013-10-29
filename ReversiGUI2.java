@@ -25,14 +25,13 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     int fontsize=30;									// FONTS
     Font Enter = new Font("Serif",Font.BOLD,fontsize);
     Font sub = new Font("Serif",Font.BOLD,10);
-    //Font title = new Font("Monospaced",Font.BOLD,18);
+    Font title = new Font("Monospaced",Font.BOLD,18);
     Font script = new Font("Dialogue",Font.BOLD,30);
     Font Failed = new Font("Serif",Font.ITALIC,80);
     Font Title = new Font("Serif",Font.BOLD,80);
-
                                                                                                     //Custom Color
-    Color Background = new Color(238,	230, 133);
-    Color Background2 = new Color(238,	200, 100);
+    Color Background = new Color(238, 230, 133);
+    Color Background2 = new Color(238, 200, 100);
     Color Board = new Color(238, 150, 50);
 
     //not Necessary ATM
@@ -71,7 +70,6 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     static int ServerID = 1;
     static int ClientID = 2;
     static int TypeClient = 0;
-	
     //difficulties
     public static int blackdifficulty = 0;
     public static int whitedifficulty = 0;
@@ -80,9 +78,9 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     public static final int hard = 2;
     int forwardturns = 0;
     int board[][] = new int[8][8];
-    int weight[][] = new int[8][8];//weight value gets calculated for each position
+    int weight[][] = new int[8][8]; //weight value gets calculated for each position
     int undoboards[][][] = new int[10][8][8];
-	//
+    //
     int wordloc=30; //shifting any words
     int turnchecker = 0;
     int turn = black;
@@ -101,23 +99,23 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		{99, -40, 8, 6, 6, 8, -40, 99},
 		}; // for Hard mode
 
-// GRAPHICS 2D
+    // GRAPHICS 2D
 
-		Point2D center = new Point2D.Float(50, 50);
-		float radius = 25;
-		Point2D focus = new Point2D.Float(40, 40);
-		float[] dist = {0.0f, 0.2f, 1.0f};
-		Color[] wcolors = {Color.WHITE, Color.lightGray, Color.lightGray};
-		RadialGradientPaint pRadialw = new RadialGradientPaint(center, radius, focus, dist, wcolors, CycleMethod.NO_CYCLE);
-		Color[] bcolors = {Color.WHITE, Color.darkGray, Color.BLACK};
-		RadialGradientPaint pRadialb = new RadialGradientPaint(center, radius, focus, dist, bcolors, CycleMethod.NO_CYCLE);
-		Color[] gcolors = {Color.WHITE, Color.lightGray, Color.GREEN};
-		RadialGradientPaint pRadialg = new RadialGradientPaint(center, radius, focus, dist, gcolors, CycleMethod.NO_CYCLE);
-		
-		Color[] backgroundcolors = {Background,Background2};
+    Point2D center = new Point2D.Float(50, 50);
+    float radius = 25;
+    Point2D focus = new Point2D.Float(40, 40);
+    float[] dist = {0.0f, 0.2f, 1.0f};
+    Color[] wcolors = {Color.WHITE, Color.lightGray, Color.lightGray};
+    RadialGradientPaint pRadialw = new RadialGradientPaint(center, radius, focus, dist, wcolors, CycleMethod.NO_CYCLE);
+    Color[] bcolors = {Color.WHITE, Color.darkGray, Color.BLACK};
+    RadialGradientPaint pRadialb = new RadialGradientPaint(center, radius, focus, dist, bcolors, CycleMethod.NO_CYCLE);
+    Color[] gcolors = {Color.WHITE, Color.lightGray, Color.GREEN};
+    RadialGradientPaint pRadialg = new RadialGradientPaint(center, radius, focus, dist, gcolors, CycleMethod.NO_CYCLE);
+
+    Color[] backgroundcolors = {Background,Background2};
                 
-        //GUI Items
-        String hostval, portval;
+    //GUI Items
+    String hostval, portval;
     
     
     static String[] connection = {"Server", "Client"};
@@ -133,7 +131,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     static JPanel details = new JPanel();
     
     //Text Labels
-    static JLabel title = new JLabel("WELCOME TO THE GAME OF REVERSI");
+    static JLabel ttl = new JLabel("WELCOME TO THE GAME OF REVERSI");
     static JLabel inst = new JLabel("SELECT A FOLLOWING GAME MODE");
     static JLabel ai1_l = new JLabel("1st AI DIFFICULTY LEVEL: ");
     static JLabel ai2_l = new JLabel("2nd AI DIFFICULTY LEVEL: ");
@@ -167,17 +165,17 @@ public class Reversi extends Applet implements MouseListener, KeyListener
     //Toggle Radio Buttons
     static JComboBox clsv = new JComboBox(connection);
 			
-	//networking
-	private static ServerSocket serversocket;
-	private static Socket clientsocket;
-	private static PrintWriter netOut;
-	private static BufferedReader netIn;
-	public static String hostname;
-	public static String portnumber;
+    //networking
+    private static ServerSocket serversocket;
+    private static Socket clientsocket;
+    private static PrintWriter netOut;
+    private static BufferedReader netIn;
+    public static String hostname;
+    public static String portnumber;
 	
-	//this xor client will be called in an instance
-	//these pass arguments, but as the main (as it is) sets the global values as well
-	public static void connectAsServer(String host, String port) throws IOException, UnknownHostException {
+    //this xor client will be called in an instance
+    //these pass arguments, but as the main (as it is) sets the global values as well
+    public static void connectAsServer(String host, String port) throws IOException, UnknownHostException {
 		hostname = host;
 		portnumber = port;
 		TypeClient = ServerID;
@@ -216,13 +214,13 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 	}
 	
-        static public int getCientType()
-	{
+    static public int getCientType() {
 	return TypeClient;
-	}
-	//this xor server will be called in an instance
-	//these pass arguments, but as the main (as it is) sets the global values as well
-	public static void connectAsClient(String host, String port) throws IOException, UnknownHostException {
+    }
+    
+    //this xor server will be called in an instance
+    //these pass arguments, but as the main (as it is) sets the global values as well
+    public static void connectAsClient(String host, String port) throws IOException, UnknownHostException {
 		hostname = host;
 		portnumber = port;
 		TypeClient = ClientID;
@@ -254,7 +252,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		}
 	}
 	
-	public void processInput(String input) {
+    public void processInput(String input) {
 		//look at input and do stuff
 		String[] rows = { "a", "b", "c", "d", "e", "f", "g", "h" };
 		String[] columns = { "1", "2", "3", "4", "5", "6", "7", "8" };
@@ -335,7 +333,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	}
 	
 	// checks if the string is a move
-	public boolean isMoveString(String input) {
+    public boolean isMoveString(String input) {
 		char[] rows = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
 		char[] columns = { '0', '1', '2', '3', '4', '5', '6', '7'};
 		
@@ -350,42 +348,39 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 	}
 	
     public void init() {
-        start();// start any threads or operations(for later if I use them)
-		
+        start();// start any threads or operations(for later if I use them)	
     }
-	
-	
+    	
     public static void main(String arg[])throws Exception {
         //ask to start server or client
-		
-		/*
-		Object[] options = { "Server", "Client" };
-		Object startAs = JOptionPane.showInputDialog(null, "Choose one", "Input", 
-				JOptionPane.INFORMATION_MESSAGE, null, 
-				options, options[0]);
-		
-		if (startAs.equals("Server")) {
-			//get host and port GUI
-			hostname = JOptionPane.showInputDialog(null, "Enter hostname", "localhost");
-			portnumber = JOptionPane.showInputDialog(null, "Enter the port number", "4444");
-			//
-			connectAsServer(hostname, portnumber);
-		}
-		else if (startAs.equals("Client")) {
-			hostname = JOptionPane.showInputDialog(null, "Enter hostname", "localhost");
-			portnumber = JOptionPane.showInputDialog(null, "Enter the port number", "4444");
-			//
-			connectAsClient(hostname, portnumber);
-		}
-		else System.out.println("Something f'ed up, it's pretty impossible to get here");
-                */
-	
-       
+
+        /*
+        Object[] options = { "Server", "Client" };
+        Object startAs = JOptionPane.showInputDialog(null, "Choose one", "Input", 
+                        JOptionPane.INFORMATION_MESSAGE, null, 
+                        options, options[0]);
+
+        if (startAs.equals("Server")) {
+                //get host and port GUI
+                hostname = JOptionPane.showInputDialog(null, "Enter hostname", "localhost");
+                portnumber = JOptionPane.showInputDialog(null, "Enter the port number", "4444");
+                //
+                connectAsServer(hostname, portnumber);
+        }
+        else if (startAs.equals("Client")) {
+                hostname = JOptionPane.showInputDialog(null, "Enter hostname", "localhost");
+                portnumber = JOptionPane.showInputDialog(null, "Enter the port number", "4444");
+                //
+                connectAsClient(hostname, portnumber);
+        }
+        else System.out.println("Something f'ed up, it's pretty impossible to get here");
+        */
+
         System.out.println("Pre GUI");
         final JFrame gui = new JFrame("Menu");
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gui.setResizable(false);
-        gui.setPreferredSize(new Dimension(720,320));
+        gui.setPreferredSize(new Dimension(680,320));
         gui.setTitle("Reversi");
         GridLayout gLayout1 = new GridLayout(0,1);
         GridLayout gLayout2 = new GridLayout(2,1);
@@ -399,20 +394,20 @@ public class Reversi extends Applet implements MouseListener, KeyListener
         gui.getContentPane().add(details);
         gui.pack();
         
-        title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        title.setFont(new Font("Tahoma", 0, 18));
+        ttl.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        ttl.setFont(new Font("Tahoma", 0, 18));
         inst.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         
         intro.setBackground(dark);
         intro.setLayout(gLayout1);
-        intro.add(title);
+        intro.add(ttl);
         intro.add(inst);
         
         game_mode.setLayout(fLayout);
         game_mode.setBackground(light);
-        u_vs_ai.setPreferredSize(new Dimension(100,23));
-        u_vs_u.setPreferredSize(new Dimension(100,23));
-        ai_vs_ai.setPreferredSize(new Dimension(100,23));
+        u_vs_ai.setPreferredSize(new Dimension(150,23));
+        u_vs_u.setPreferredSize(new Dimension(150,23));
+        ai_vs_ai.setPreferredSize(new Dimension(150,23));
         
         game_mode.add(u_vs_ai);
         game_mode.add(u_vs_u);
@@ -446,12 +441,9 @@ public class Reversi extends Applet implements MouseListener, KeyListener
         network.add(hostf);
         network.add(portl);
         network.add(portf);
-        //network.add(con);
         network.add(game);
         hostf.setText("localhost"); //Defaults
         portf.setText("4444"); //Defaults
-        
-        
         
         details.setBackground(dark);
         details.setLayout(gLayout1);
@@ -460,8 +452,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
         creds1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         creds2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         
-
-       u_vs_u.addActionListener(new ActionListener(){
+        u_vs_u.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 ai1_l.setEnabled(false);
                 ai1_e.setEnabled(false);
@@ -551,36 +542,9 @@ public class Reversi extends Applet implements MouseListener, KeyListener
             }
         });
         
-        /*
-        con.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
-                hostname = hostf.getText();
-                portnumber = portf.getText();
-                String choice  = (String)clsv.getSelectedItem();
-                //JOptionPane.showMessageDialog(null,"Choice: " + choice + ", Host #: " + hostname + ", Port #: " + portnumber,"PARAMETERS", JOptionPane.PLAIN_MESSAGE);
-                if (choice.equals("Server")){
-                    try {                    
-                        connectAsServer(hostname, portnumber);
-                    } catch (IOException ex) {
-                        Logger.getLogger(Reversi.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    
-                } else if (choice.equals("Client")){
-                    try {
-                        connectAsClient(hostname, portnumber);
-                    } catch (IOException ex) {
-                        Logger.getLogger(Reversi.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                } else {
-                    System.out.println("Something f'ed up, it's pretty impossible to get here");
-                }
-            }
-        });
-        */
-        
         game.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                                hostname = hostf.getText();
+                hostname = hostf.getText();
                 portnumber = portf.getText();
                 String choice  = (String)clsv.getSelectedItem();
                 //JOptionPane.showMessageDialog(null,"Choice: " + choice + ", Host #: " + hostname + ", Port #: " + portnumber,"PARAMETERS", JOptionPane.PLAIN_MESSAGE);
@@ -616,22 +580,24 @@ public class Reversi extends Applet implements MouseListener, KeyListener
                 
                 
                 //JOptionPane.showMessageDialog(null,"Host #: " + hostname + "Port #: " + portnumber,"PARAMETERS", JOptionPane.PLAIN_MESSAGE);
-               // JFrame board = new JFrame("Gui made window");
-               // board.setVisible(true);
-               // board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                JFrame board = new JFrame("Gui made window");
+                board.setVisible(true);
+                board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                
-                 Frame frame = new Frame();
+                 //Frame frame = new Frame();
                  Applet applet = new Reversi();
-                 
+                 board.add(applet);
+                 /*
                  frame.addWindowListener(new WindowAdapter() {
                     public void windowClosing(WindowEvent e) {
                         System.exit(0);
                     }	
                 });
-                frame.add(applet);
-                frame.setSize(apwidth,apheight);
-                   frame.setVisible(true);
-                 //frame.show();
+                * */
+                //frame.add(applet);
+                //frame.setSize(apwidth,apheight);
+                //frame.setVisible(true);
+                //frame.show();
                 
                 p=2;
                  gui.dispose();
@@ -661,13 +627,13 @@ public class Reversi extends Applet implements MouseListener, KeyListener
         serversocket.close();
 
     }
+    
+    //key events
+    public void keyPressed(KeyEvent evt) {
+    }
 	
-	
-    public void keyPressed(KeyEvent evt) //key events
-    {    }
-	
-    public void keyReleased(KeyEvent evt)	
-    {    }
+    public void keyReleased(KeyEvent evt) {
+    }
 	
     public void keyTyped(KeyEvent evt) {
         int key=0; key = evt.getKeyCode(); 
