@@ -347,14 +347,30 @@ public class Reversi extends Applet implements MouseListener, KeyListener
         clientsocket.close();
         serversocket.close();
     }
-		
+	public void keyPressed(KeyEvent evt) //key events
+	{
+	}
+	public void keyReleased(KeyEvent evt)	
+	{
+	}
     public void keyTyped(KeyEvent evt) {
         int key=0; key = evt.getKeyCode(); 
         if(typingClient)
         ClientId+=evt.getKeyChar();
         repaint();
     }
-	
+	public void mousePressed(MouseEvent e) {//mouse events
+    }
+
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    public void mouseExited(MouseEvent e) {
+    }
+
     public void mouseClicked(MouseEvent e) {
         mX = e.getX();
         mY = e.getY();
@@ -398,7 +414,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
             String inputhere;
             inputhere = netIn.readLine();
             System.out.println(inputhere);
-        } catch(IOException e){System.out.println("didn't work, who'd a thunk");}
+        } catch(IOException e){System.out.println("server message sending didn't work");}
         //---------------------------------------
         Graphics2D g2 = (Graphics2D)g;
         if(p==-1) { // start up the Listeners (happens once)
