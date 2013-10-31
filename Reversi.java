@@ -963,18 +963,24 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		int resetj=j;
 		int reseti=i;
 		int counter = 0;
+		int stop= 0;
 		if(j>0&&board[i][j-1]!=blank&&board[i][j-1]!=green) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
-				if (board[i][j]==turn)
+		counter++;
+		j--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
+				//if (board[i][j]!=turn)
 					counter++;
 					j--;
 			}
+			if (j<0||board[i][j]!=turn)
+			counter=0;
 			i=reseti;
 			j=resetj;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0) {
-				if (board[i][j]==turn) {
+			j--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0&&board[i][j]!=turn) {
+				//if (board[i][j]!=turn) {
 					counter--;
-				}
+				//}
 				board[i][j]=turn;
 				j--;
 			}
@@ -984,17 +990,22 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//right
 		if(j<7&&board[i][j+1]!=blank&&board[i][j+1]!=green) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
-				if (board[i][j]==turn)
+		counter++;
+		j++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
+				//if (board[i][j]==turn)
 					counter++;
 				j++;
 			}
+			if (j>7||board[i][j]!=turn)
+			counter=0;
 			i=reseti;
 			j=resetj;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0) {
-				if (board[i][j]==turn) {
+			j++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0&&board[i][j]!=turn) {
+				//if (board[i][j]==turn) {
 					counter--;
-				}
+				//}
 				board[i][j]=turn;
 				j++;
 			}
@@ -1005,17 +1016,22 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//up
 		if(i>0&&board[i-1][j]!=blank&&board[i-1][j]!=green) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
-				if (board[i][j]==turn)
+		counter++;
+		i--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
+				//if (board[i][j]==turn)
 					counter++;
 				i--;
 			}
+			if (i<0||board[i][j]!=turn)
+			counter=0;
 			i=reseti;
 			j=resetj;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0) {
-				if (board[i][j]==turn) {
+			i--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0&&board[i][j]!=turn) {
+				//if (board[i][j]==turn) {
 				counter--;
-				}
+				//}
 				board[i][j]=turn;
 				i--;
 			}
@@ -1026,17 +1042,22 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//down
 		if(i<7&&board[i+1][j]!=blank&&board[i+1][j]!=green) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
-				if (board[i][j]==turn)
+		counter++;
+		i++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
+				//if (board[i][j]==turn)
 					counter++;
 				i++;
 			}
+			if (i>7||board[i][j]!=turn)
+			counter=0;
 			i=reseti;
 			j=resetj;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0) {
-				if (board[i][j]==turn) {
+			i++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0&&board[i][j]!=turn) {
+				//if (board[i][j]==turn) {
 				counter--;
-				}
+				//}
 				board[i][j]=turn;
 				i++;
 			}
@@ -1047,18 +1068,25 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//up left
 		if(i<7&&j>0&&board[i+1][j-1]!=blank&&board[i+1][j-1]!=green) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
-				if (board[i][j]==turn)
+		counter++;
+		j--;
+		i++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
+				//if (board[i][j]==turn)
 					counter++;
 				j--;
 				i++;
 			}
+			if (i>7||j<0||board[i][j]!=turn)
+			counter=0;
 			i=reseti;
 			j=resetj;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0) {
-				if (board[i][j]==turn) {
+			j--;
+			i++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0&&board[i][j]!=turn) {
+				//if (board[i][j]==turn) {
 				counter--;
-				}
+				//}
 				board[i][j]=turn;
 				j--;
 				i++;
@@ -1070,18 +1098,25 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//up right
 		if(i<7&&j<7&&board[i+1][j+1]!=blank&&board[i+1][j+1]!=green) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
-				if (board[i][j]==turn)
+		counter++;
+		j++;
+		i++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
+				//if (board[i][j]==turn)
 					counter++;
 				j++;
 				i++;
 			}
+			if (i>7||j>7||board[i][j]!=turn)
+			counter=0;
 			i=reseti;
 			j=resetj;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0) {
-				if (board[i][j]==turn) {
+			j++;
+			i++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0&&board[i][j]!=turn) {
+				//if (board[i][j]==turn) {
 				counter--;
-				}
+				//}
 				board[i][j]=turn;
 				j++;
 				i++;
@@ -1093,18 +1128,27 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//down left
 		if(i>0&&j>0&&board[i-1][j-1]!=blank&&board[i-1][j-1]!=green) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
-				if (board[i][j]==turn)
+		
+		counter++;
+		j--;
+		i--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
+				//if (board[i][j]==turn)
 					counter++;
 				j--;
 				i--;
 			}
+			if (i<0||j<0||board[i][j]!=turn)
+			counter=0;
 			i=reseti;
 			j=resetj;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0) {
-				if (board[i][j]==turn) {
+			j--;
+			i--;
+			
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0&&board[i][j]!=turn) {
+				//if (board[i][j]==turn) {
 				counter--;
-				}
+				//}
 				board[i][j]=turn;
 				j--;
 				i--;
@@ -1116,18 +1160,25 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//down right
 		if(i>0&&j<7&&board[i-1][j+1]!=blank&&board[i-1][j+1]!=green) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
-				if (board[i][j]==turn)
+		counter++;
+		j++;
+		i--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
+				//if (board[i][j]==turn)
 					counter++;
 				j++;
 				i--;
 			}
+			if (i<0||j>7||board[i][j]!=turn)
+			counter=0;
 			i=reseti;
 			j=resetj;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0) {
-				if (board[i][j]==turn) {
+			j++;
+			i--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&counter>0&&board[i][j]!=turn) {
+				//if (board[i][j]==turn) {
 				counter--;
-				}
+				//}
 				board[i][j]=turn;
 				j++;
 				i--;
@@ -1143,7 +1194,8 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		int resetj=j;
 		int reseti=i;
 		if(j>0&&board[i][j-1]==otherturn) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+		j--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				j--;
 			}
 			if(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]==blank)
@@ -1154,7 +1206,8 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//right
 		if(j<7&&board[i][j+1]==otherturn) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+		j++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				j++;
 			}
 			if(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]==blank)
@@ -1165,7 +1218,8 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//up
 		if(i>0&&board[i-1][j]==otherturn) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+		i--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				i--;
 			}
 			if(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]==blank)
@@ -1176,7 +1230,8 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//down
 		if(i<7&&board[i+1][j]==otherturn) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+		i++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				i++;
 			}
 			if(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]==blank)
@@ -1187,7 +1242,9 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//up left
 		if(i<7&&j>0&&board[i+1][j-1]==otherturn) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+		j--;
+		i++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				j--;
 				i++;
 			}
@@ -1199,7 +1256,9 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//up right
 		if(i<7&&j<7&&board[i+1][j+1]==otherturn) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+		j++;
+		i++;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				j++;
 				i++;
 			}
@@ -1211,7 +1270,9 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//down left
 		if(i>0&&j>0&&board[i-1][j-1]==otherturn) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+			j--;
+			i--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				j--;
 				i--;
 			}
@@ -1223,7 +1284,9 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		
 		//down right
 		if(i>0&&j<7&&board[i-1][j+1]==otherturn) {
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+		j++;
+		i--;
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				j++;
 				i--;
 			}
@@ -1241,7 +1304,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		int counter = 0;
 		if(j>0&&board[i][j-1]!=blank&&board[i][j-1]!=green) {
 			j--;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				if (board[i][j]!=turn)
 					counter++;
 				j--;
@@ -1254,7 +1317,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		//right
 		if(j<7&&board[i][j+1]!=blank&&board[i][j+1]!=green) {
 		j++;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				if (board[i][j]!=turn)
 					counter++;
 				j++;
@@ -1267,7 +1330,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		//up
 		if(i>0&&board[i-1][j]!=blank&&board[i-1][j]!=green) {
 		i--;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				if (board[i][j]!=turn)
 					counter++;
 				i--;
@@ -1280,7 +1343,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		//down
 		if(i<7&&board[i+1][j]!=blank&&board[i+1][j]!=green) {
 		i++;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				if (board[i][j]!=turn)
 					counter++;
 				i++;
@@ -1294,7 +1357,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		if(i<7&&j>0&&board[i+1][j-1]!=blank&&board[i+1][j-1]!=green) {
 			j--;
 			i++;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				if (board[i][j]!=turn)
 					counter++;
 				j--;
@@ -1308,7 +1371,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		if(i<7&&j<7&&board[i+1][j+1]!=blank&&board[i+1][j+1]!=green) {
 			j++;
 			i++;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				if (board[i][j]!=turn)
 					counter++;
 				j++;
@@ -1322,7 +1385,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		if(i>0&&j>0&&board[i-1][j-1]!=blank&&board[i-1][j-1]!=green) {
 			j--;
 			i--;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				if (board[i][j]!=turn)
 					counter++;
 				j--;
@@ -1336,7 +1399,7 @@ public class Reversi extends Applet implements MouseListener, KeyListener
 		if(i>0&&j<7&&board[i-1][j+1]!=blank&&board[i-1][j+1]!=green) {
 			j++;
 			i--;
-			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green) {
+			while(j>=0&&j<=7&&i>=0&&i<=7&&board[i][j]!=blank && board[i][j]!=green&&board[i][j]!=turn) {
 				if (board[i][j]!=turn)
 					counter++;
 				j++;
